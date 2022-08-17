@@ -19,21 +19,23 @@ const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
 /**
- * Create HTTP server.
- */
-
-const server = http.createServer(app)
-
-/**
  * Database connections and Listen on provided port, on all network interfaces.
  */
 mongoose.connection
     .on('error', console.error.bind(console, new Error('Database Connection Error!')))
     .once('open', () => {
-        server.listen(port)
-        server.on('error', onError)
-        server.on('listening', onListening)
+        console.log(chalk.red.italic(`    
+          💾 Database connected!
+        `))
     })
+
+/**
+ * Create HTTP server.
+ */
+const server = http.createServer(app)
+server.listen(port)
+server.on('error', onError)
+server.on('listening', onListening)
 
 /**
  * Normalize a port into a number, string, or false.
