@@ -1,0 +1,71 @@
+// get all user
+GET {{base}}/user
+
+###
+
+// get user by id
+GET {{base}}/user/63049de40a8779bd2b154792
+
+###
+
+// create new user
+POST {{base}}/user
+Content-Type: application/json
+
+{
+    "username":"novi",
+    "gender":"female",
+    "email":"novi@gmail.com",
+    "password":"123456",
+    "confirm_password":"123456"
+}
+
+###
+
+// user login with username or email
+POST {{base}}/user/login
+Content-Type: application/json
+
+{
+    "username":"novis",
+    "password":"123456"
+}
+
+###
+
+// get all user's post
+GET {{base}}/user/post
+
+###
+// Menghapus user by id
+GET  {{base}}/user/del/614ed4368786e871772204b3
+
+###
+// follow
+PUT {{base}}/user/follow
+Content-Type: application/json
+
+// ceritanya si bellar ingin mengikuti si alexander
+{
+    // user yang akan difollow (android02)
+    "followId":"615d236eb8cf0b625206c863",
+    // user yang akan memfollow (android01)
+    "userId": "615e8e1bc9715ae9c37caf44"
+}
+
+###
+// unfollow
+PUT {{base}}/user/unfollow
+Content-Type: application/json
+
+// ceritanya si bellar ingin tidak lagi mengikuti si alexander
+{
+    // user yang akan diunfollow (android02)
+    "unfollowId":"615d236eb8cf0b625206c863",
+    // user yang akan mengunfollow (bellar)
+    "userId": "615e8e1bc9715ae1c37caf44"
+}
+
+###
+// Menampilkan followers dan following user
+GET {{base}}/user/follow-status

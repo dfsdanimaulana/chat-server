@@ -1,70 +1,3 @@
-// Menambah user baru
-POST http://localhost:3003/user
-Content-Type: application/json
-
-{
-    "username":"android01",
-    "gender":"female",
-    "email":"android01@gmail.com",
-    "password":"123456",
-    "confirm_password":"123456"
-}
-
-###
-
-// Menampilkan seluruh user
-GET http://localhost:3003/user
-
-###
-
-// Menampilkan user BY ID
-GET http://localhost:3003/user/615d236eb8cf0b625206c863
-
-###
-// Test login
-POST http://localhost:3003/user/login
-Content-Type: application/json
-
-{
-    "username":"guest",
-    "password":"123456"
-}
-###
-
-// Menampilkan seluruh user beserta postingan
-GET http://localhost:3003/user/post
-
-###
-
-// follow
-PUT http://localhost:3003/user/follow
-Content-Type: application/json
-
-// ceritanya si bellar ingin mengikuti si alexander
-{
-    // user yang akan difollow (android02)
-    "followId":"615d236eb8cf0b625206c863",
-    // user yang akan memfollow (android01)
-    "userId": "615e8e1bc9715ae9c37caf44"
-}
-
-###
-// unfollow
-PUT http://localhost:3003/user/unfollow
-Content-Type: application/json
-
-// ceritanya si bellar ingin tidak lagi mengikuti si alexander
-{
-    // user yang akan diunfollow (android02)
-    "unfollowId":"615d236eb8cf0b625206c863",
-    // user yang akan mengunfollow (bellar)
-    "userId": "615e8e1bc9715ae1c37caf44"
-}
-
-###
-// Menampilkan followers dan following user
-GET http://localhost:3003/user/follow-status
-
 
 ###
 
@@ -81,7 +14,7 @@ Content-Type: application/json
 ###
 
 // Menampilkan seluruh postingan
-GET http://localhost:3003/post
+GET {{base}}/post
 ###
 
 // Menghapus postingan by id
@@ -89,10 +22,7 @@ GET http://localhost:3003/post/del/615d1be22cp242c8c2dada05
 
 ###
 
-// Menghapus user by id
-GET  http://localhost:3003/user/del/614ed4368786e871772204b3
 
-###
 
 // menambahkan comment pada postingan
 POST http://localhost:3003/comment
