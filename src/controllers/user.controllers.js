@@ -9,24 +9,24 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user.models')
 
 // get all user in database
-exports.getUsers = async (req, res) => {
+const getUsers = async (req, res) => {
     try {
         const user = await User.find(
             {},
             '_id username email gender desc followers following post img_thumb'
         )
-        res.json(user)
-    } catch (error) {
-        debug({ error })
+        res.status(200).json(user)
+    } catch (err) {
+        debug(err)
         res.status(404).json({
-            error: error.message,
+            error: err.message,
         })
     }
 }
 
 // create jwt token
-const createToken = (id) =>
-    jwt.sign(
+const createToken = (id) => {
+    return jwt.sign(
         {
             id,
         },
@@ -35,9 +35,10 @@ const createToken = (id) =>
             expiresIn: 24 * 60 * 60,
         }
     )
+}
 
 // signup handler
-exports.addUser = async (req, res) => {
+const addUser = async (req, res) => {
     const { username, email, password, gender, confirm_password } = req.body
 
     const error = []
@@ -61,13 +62,7 @@ exports.addUser = async (req, res) => {
         ? error.push('username must contain alphabet')
         : !isAlphanumeric(username) &&
           error.push('username must not contain any special characters')
-
-    // cek if username is already exist
-    const userExist = await User.findOne({
-        username,
-    })
-    userExist && error.push('user already exist')
-
+          
     /** validate email */
 
     // cek if email exists
@@ -76,90 +71,70 @@ exports.addUser = async (req, res) => {
             error: ['email required'],
         })
     }
-    // cek if email valid
-    !isEmail(email) && error.push('email not valid')
-
-    // cek if email is already exist
-    const emailExist = await User.findOne({
-        email,
-    })
-    emailExist && error.push('email already exist')
-
+    
     /**  validate password */
-
     // cek if password exists
     if (!password) {
         return res.status(422).json({
             error: ['password required'],
         })
     }
-
-    // cek confirm password
-    password !== confirm_password && error.push('confirm password not match')
-
-    let hashedPassword = ''
-
     // cek password length
     if (password.length < 6) {
         error.push('password must be more than 6 characters')
-    } else {
-        // hash password
-        try {
-            const salt = await genSalt()
-            hashedPassword = await hash(password, salt)
-        } catch (error) {
-            debug({ error })
-            res.status(422).json({
-                error: error.message,
-            })
-        }
     }
+    // cek confirm password
+    password !== confirm_password && error.push('confirm password not match')
 
-    // set default user image profile
-    let img = ''
-    gender === 'male' ? (img = '/male.png') : (img = '/female.png')
-
+    // send error if exist 
     if (error.length > 0) {
         return res.status(422).json({
-            error,
+            error
         })
     }
+    
+    try {
+      // hash password
+      let hashedPassword
+      const salt = await genSalt()
+      hashedPassword = await hash(password, salt)
+      
+      // set default user image profile
+      let img
+      gender === 'male' ? (img = '/male.png') : (img = '/female.png')
 
-    // initialize new user collection
-    const user = new User({
-        img,
-        email,
-        gender,
-        username,
-        password: hashedPassword,
-    })
-
-    // save to database
-    user.save()
-        .then((user) => {
-            // All validation done and new user added
-            debug(user)
-
-            // create cookie with jwt token
-            const token = createToken(user._id)
-            res.cookie('jwt', token, {
-                maxAge: 24 * 60 * 60 * 1000,
-                httpOnly: true,
-            })
-
-            // set current user in session
-            req.user = user
-            res.json({
-                message: 'new user added',
-                user,
-            })
-        })
-        .catch((error) => {
-            debug({ error })
-            res.status(422).json({
-                error: error.message,
-            })
-        })
+      // initialize new user collection
+      const user = new User({
+          img,
+          email,
+          gender,
+          username,
+          password: hashedPassword,
+      })
+      
+      // save new user to db
+      const savedUser = await user.save()
+      
+      // create cookie with jwt token
+      const token = createToken(user._id)
+      
+      res.cookie('jwt', token, {
+          maxAge: 24 * 60 * 60 * 1000,
+          httpOnly: true,
+      })
+      
+      // set current user in session
+      req.user = savedUser
+      res.json({
+          message: 'new user added',
+          savedUser
+      })
+    } catch (err) {
+      debug(err)
+      res.status(422).json({
+          error: err.message
+      })
+    }
 }
 
 /** When user signup end */
@@ -167,13 +142,15 @@ exports.addUser = async (req, res) => {
 /**
  * when user login
  */
-exports.checkUser = async (req, res) => {
+const checkUser = async (req, res) => {
     const { username, password } = req.body
 
-    let passToCheck = ''
-    let currentUser = ''
-
-    if (isEmail(username)) {
+    try {
+      
+      let passToCheck
+      let currentUser
+    
+      if (isEmail(username)) {
         // get user password by email
         const user = await User.findOne(
             {
@@ -187,13 +164,13 @@ exports.checkUser = async (req, res) => {
             passToCheck = user.password
             currentUser = user
         }
-    } else {
+      } else {
         // get user password by username
         const user = await User.findOne(
             {
                 username,
             },
-            'username email desc post password followers following img_thumb img_bg'
+            'username password email desc post followers following img_thumb img_bg'
         ).populate('post')
         if (!user) {
             return res.status(404).json({ error: 'username not found guys' })
@@ -202,29 +179,30 @@ exports.checkUser = async (req, res) => {
             currentUser = user
         }
     }
+    
+    // check if password valid 
     const isValid = await compare(password, passToCheck)
     if (isValid) {
         // create cookie with jwt token
         const token = createToken(currentUser._id)
-        debug(token)
-
         res.cookie('jwt', token, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
+            httpOnly: true
         })
 
         // create current user
         req.user = currentUser
         return res.json(currentUser)
-    } else {
-        return res.status(403).json({
-            error: 'incorrect password',
-        })
+    } catch (err) {
+      debug(err)
+      res.status(422).json({
+          error: err.message
+      })
     }
+  }
 }
 
-/** Cek if user already logged in */
-exports.isLoggedIn = (req, res) => {
+const isLoggedIn = (req, res) => {
     if (req.user) {
         res.json({
             isLoggedIn: true,
@@ -233,6 +211,7 @@ exports.isLoggedIn = (req, res) => {
     } else {
         if (req.cookies.jwt) {
             debug(req.cookies)
+            // set currentUser from cookies
         } else {
             res.json({
                 loggedIn: false,
@@ -243,7 +222,9 @@ exports.isLoggedIn = (req, res) => {
 
 /** When user login end */
 
-exports.updateUserData = async (req, res) => {
+// update user by id
+
+const updateUserData = async (req, res) => {
     try {
         const { id, queryString, data } = req.body
         let query = {}
@@ -267,9 +248,14 @@ exports.updateUserData = async (req, res) => {
             default:
                 query = {}
         }
-        const user = User.findByIdAndUpdate(id, query, {
+        const user = await User.findByIdAndUpdate(id, query, {
             new: true,
         })
+        if(!user){
+          return res.status(404).json({
+            message: 'user not found'
+          })
+        }
         res.json({
             message: 'update Success',
             user,
@@ -282,11 +268,16 @@ exports.updateUserData = async (req, res) => {
     }
 }
 
-// remove user
-exports.removeUser = async (req, res) => {
+// remove user by id
+const removeUser = async (req, res) => {
     try {
         const { id } = req.params
         const user = await User.findByIdAndDelete(id)
+        if(!user){
+          return res.status(404).json({
+            message: 'user not found'
+          })
+        }
         res.json({
             message: `user with id=${user._id} and username=${user.username} has been deleted`,
         })
@@ -298,7 +289,7 @@ exports.removeUser = async (req, res) => {
     }
 }
 
-exports.getUserWithPost = async (req, res) => {
+const getUserWithPost = async (req, res) => {
     try {
         const user = await User.find().populate('post')
         res.json(user)
@@ -310,7 +301,7 @@ exports.getUserWithPost = async (req, res) => {
     }
 }
 
-exports.getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
     try {
         const { id } = req.params
         const user = await User.findById(
@@ -328,7 +319,7 @@ exports.getUserById = async (req, res) => {
 
 // follower and following
 
-exports.follow = async (req, res) => {
+const follow = async (req, res) => {
     try {
         // selanjutnya, userId akan diganti dengan id user yang sedang login
         const { followId, userId } = req.body
@@ -397,7 +388,7 @@ exports.follow = async (req, res) => {
 
 // unfollow
 
-exports.unFollow = async (req, res) => {
+const unFollow = async (req, res) => {
     try {
         // selanjutnya, userId akan diganti dengan id user yang sedang login
         const { unfollowId, userId } = req.body
@@ -463,7 +454,7 @@ exports.unFollow = async (req, res) => {
     }
 }
 
-exports.followStatus = async (req, res) => {
+const followStatus = async (req, res) => {
     try {
         const user = await User.find(
             {},
@@ -476,4 +467,19 @@ exports.followStatus = async (req, res) => {
             error: error.message,
         })
     }
+}
+
+module.exports = {
+  getUsers,
+  createToken,
+  addUser,
+  checkUser,
+  isLoggedIn,
+  updateUserData,
+  removeUser,
+  getUserWithPost,
+  getUserById,
+  follow,
+  unFollow,
+  followStatus
 }
