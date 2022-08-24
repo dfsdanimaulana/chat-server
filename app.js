@@ -17,13 +17,16 @@ app.use(
     })
 )
 
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
+app.use(
+    express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 })
+)
 
 app.use(cookieParser())
 
-app.use(express.urlencoded({
-    extended: false
-}))
+// app.use(express.urlencoded({
+//     extended: false
+// }))
 
 // Routes
 app.use('/user', require('./src/routes/user.routes'))
@@ -50,7 +53,7 @@ app.use(function (err, req, res) {
     // render the error page
     res.status(err.status || 500)
     res.json({
-        message: 'Page Not Found'
+        message: 'Page Not Found',
     })
 })
 

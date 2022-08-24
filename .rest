@@ -6,9 +6,9 @@ POST http://localhost:3003/post
 Content-Type: application/json
 
 {
-    "userId":"615d22acb8cf0b625206c84e",
-    "caption":"hai welcome to dstopia",
-    "hashtag":"new user join"
+    "userId":"63049de40a8779bd2b154792",
+    "caption":"im testing upload multiple images",
+    "hashtag":"multiple image"
 }
 
 ###

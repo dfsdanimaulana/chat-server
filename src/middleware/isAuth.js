@@ -2,7 +2,7 @@
 
 const jwt = require('jsonwebtoken')
 
-exports.isAuth = (req, res, next) => {
+const isAuth = (req, res, next) => {
     const token = req.cookies.jwt
 
     if (!token)
@@ -19,3 +19,5 @@ exports.isAuth = (req, res, next) => {
         next()
     })
 }
+
+module.exports = { isAuth }

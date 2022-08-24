@@ -11,9 +11,7 @@ const {
 } = require('../controllers/post.controllers')
 
 // Middleware
-const {
-    isAuth
-} = require('../middleware/isAuth')
+const { isAuth } = require('../middleware/isAuth')
 
 // delete post
 router.get('/del/:id', isAuth, removePost)
@@ -22,7 +20,9 @@ router.get('/del/:id', isAuth, removePost)
 router.get('/', getPost)
 
 // Add post
-router.post('/', isAuth, addPost)
+router.post('/', addPost)
+// // Add post
+// router.post('/', isAuth, addPost)
 
 // update post
 router.put('/', isAuth, updatePostCaption)

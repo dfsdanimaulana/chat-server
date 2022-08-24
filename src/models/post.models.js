@@ -12,14 +12,16 @@ const postSchema = new Schema(
             ref: 'User',
             required: true,
         },
-        img_post_id: {
-            type: String,
-            required: true,
-        },
-        img_post_url: {
-            type: String,
-            required: true,
-        },
+        img_post_id: [
+            {
+                type: String,
+            },
+        ],
+        img_post_url: [
+            {
+                type: String,
+            },
+        ],
         timeSend: {
             type: String,
             default: moment().format('hh:mm A'),
@@ -65,13 +67,41 @@ postSchema.methods.addToUserPost = function (userId) {
     )
 }
 
-// menambahkan hashtag yg sudah di format ke dalam bentuk array
+// add array formatted hashtag
 postSchema.methods.addHashtag = function (arr) {
     return Post.updateOne(
         { _id: this.id },
         {
             $addToSet: {
                 hashtag: {
+                    $each: arr,
+                },
+            },
+        }
+    )
+}
+
+// add array formatted img_post_id
+postSchema.methods.addImgPostId = function (arr) {
+    return Post.updateOne(
+        { _id: this.id },
+        {
+            $addToSet: {
+                img_post_id: {
+                    $each: arr,
+                },
+            },
+        }
+    )
+}
+
+// add array formatted img_post_url
+postSchema.methods.addImgPostUrl = function (arr) {
+    return Post.updateOne(
+        { _id: this.id },
+        {
+            $addToSet: {
+                img_post_url: {
                     $each: arr,
                 },
             },
