@@ -68,7 +68,7 @@ exports.getPost = async (req, res) => {
         const data = await Post.find({})
             .populate({
                 path: 'user',
-                select: 'username',
+                select: 'username img_thumb',
             })
             .populate({
                 path: 'comment',
