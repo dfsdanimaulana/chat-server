@@ -152,8 +152,10 @@ const checkUser = async (req, res) => {
         // get user password by username
         const user = await User.findOne(
             isEmail(username) ? { email: username } : { username },
-            'username password email desc post followers following img_thumb img_bg'
-        ).populate('post')
+            'username name password email desc post followers following img_thumb img_bg'
+        )
+            .sort({ createdAt: -1 })
+            .populate('post')
         if (!user) {
             if (isEmail(username)) {
                 return res.status(404).json({ error: 'email not found' })

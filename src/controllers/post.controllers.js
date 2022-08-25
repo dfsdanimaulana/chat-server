@@ -66,6 +66,7 @@ exports.addPost = async (req, res) => {
 exports.getPost = async (req, res) => {
     try {
         const data = await Post.find({})
+            .sort({ createdAt: -1 })
             .populate({
                 path: 'user',
                 select: 'username img_thumb',

@@ -18,6 +18,10 @@ const userSchema = new Schema(
                 'username must not have any special character',
             ],
         },
+        name: {
+            type: String,
+            default: '',
+        },
         img_thumb: {
             type: String,
             default: 'https://source.unsplash.com/random/128x128',
@@ -45,7 +49,7 @@ const userSchema = new Schema(
         },
         desc: {
             type: String,
-            default: 'no description',
+            default: '',
         },
         followers: [
             {
