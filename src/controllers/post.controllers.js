@@ -107,13 +107,30 @@ exports.updatePostCaption = (req, res) => {
     }
 }
 
-exports.removePost = (req, res) => {
+exports.removePost = async (req, res) => {
     try {
         const { id } = req.params
-        const query = Post.findByIdAndDelete(id)
+        const query = await Post.findByIdAndDelete(id)
         res.json({ message: 'post removed', query })
     } catch (error) {
         debug({ error })
         res.status(400).send(error)
     }
+}
+
+// get all user post by userid
+exports.getUserPostById = async (req, res) => {
+  try {
+      const { userId } = req.params
+      const userPosts = await Post.find({user: userId})
+                  .sort({createdAt: -1})
+                  .populate({
+                    path: 'user',
+                    select: 'username img_thumb'
+                  })
+      res.status(200).json(userPosts)
+  } catch (err) {
+    debug({err})
+    res.status(400).json({error: err.message})
+  }
 }

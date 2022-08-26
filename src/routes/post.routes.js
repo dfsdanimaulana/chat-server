@@ -8,6 +8,7 @@ const {
     addPost,
     updatePostCaption,
     removePost,
+    getUserPostById
 } = require('../controllers/post.controllers')
 
 // Middleware
@@ -15,6 +16,9 @@ const { isAuth } = require('../middleware/isAuth')
 
 // delete post
 router.get('/del/:id', isAuth, removePost)
+
+// get all user posts by userid
+router.get('/:userId', getUserPostById)
 
 // get post
 router.get('/', getPost)
