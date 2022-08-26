@@ -8,31 +8,6 @@ GET {{base}}/user/63049de40a8779bd2b154792
 
 ###
 
-// create new user
-POST {{base}}/user
-Content-Type: application/json
-
-{
-    "username":"novi",
-    "gender":"female",
-    "email":"novi@gmail.com",
-    "password":"123456",
-    "confirm_password":"123456"
-}
-
-###
-
-// user login with username or email
-POST {{base}}/user/login
-Content-Type: application/json
-
-{
-    "username":"guest",
-    "password":"123456"
-}
-
-###
-
 // get all user's post
 GET {{base}}/user/post
 

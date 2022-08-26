@@ -1,0 +1,22 @@
+// login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "username":"guest",
+    "password":"123456"
+}
+
+###
+// register
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+    "username":"novi",
+    "gender":"female",
+    "email":"novi@gmail.com",
+    "password":"123456",
+    "confirm_password":"123456"
+}
+###

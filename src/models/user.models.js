@@ -24,7 +24,7 @@ const userSchema = new Schema(
         },
         img_thumb: {
             type: String,
-            default: 'https://source.unsplash.com/random/128x128',
+            default: 'https://i.ibb.co/jkKCvyd/male-avatar.png',
         },
         img_bg: {
             type: String,

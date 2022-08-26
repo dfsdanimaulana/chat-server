@@ -29,6 +29,7 @@ app.use(cookieParser())
 // }))
 
 // Routes
+app.use('/auth', require('./src/routes/auth.routes'))
 app.use('/user', require('./src/routes/user.routes'))
 app.use('/post', require('./src/routes/post.routes'))
 app.use('/comment', require('./src/routes/comment.routes'))
