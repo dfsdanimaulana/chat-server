@@ -3,7 +3,6 @@
 const debug = require('debug')('dev')
 const { cloudinary } = require('../config/cloudinary')
 const Post = require('../models/post.models')
-require('dotenv').config()
 
 // create new post
 exports.addPost = async (req, res) => {

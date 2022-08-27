@@ -3,7 +3,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "username":"guest",
+    "username":"novi",
     "password":"123456"
 }
 
@@ -20,3 +20,8 @@ Content-Type: application/json
     "confirm_password":"123456"
 }
 ###
+
+GET {{base}}/auth
+###
+
+POST {{base}}/auth/refresh

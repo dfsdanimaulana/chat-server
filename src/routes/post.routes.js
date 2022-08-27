@@ -8,27 +8,25 @@ const {
     addPost,
     updatePostCaption,
     removePost,
-    getUserPostById
+    getUserPostById,
 } = require('../controllers/post.controllers')
 
 // Middleware
-const { isAuth } = require('../middleware/isAuth')
+const { verifyToken } = require('../middleware/verifyToken')
 
 // delete post
-router.get('/del/:id', isAuth, removePost)
+router.get('/del/:id', verifyToken, removePost)
 
-// get all user posts by userid
-router.get('/:userId', getUserPostById)
+// get all user posts by userId
+router.get('/:userId', verifyToken, getUserPostById)
 
 // get post
 router.get('/', getPost)
 
 // Add post
-router.post('/', addPost)
-// // Add post
-// router.post('/', isAuth, addPost)
+router.post('/', verifyToken, addPost)
 
 // update post
-router.put('/', isAuth, updatePostCaption)
+router.put('/', verifyToken, updatePostCaption)
 
 module.exports = router

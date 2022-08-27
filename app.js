@@ -4,6 +4,8 @@ const express = require('express')
 const createError = require('http-errors')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const mongoose = require('./src/config/mongodb')
+const chalk = require('chalk')
 require('dotenv').config()
 
 const app = express()
@@ -23,10 +25,6 @@ app.use(
 )
 
 app.use(cookieParser())
-
-// app.use(express.urlencoded({
-//     extended: false
-// }))
 
 // Routes
 app.use('/auth', require('./src/routes/auth.routes'))
@@ -57,5 +55,20 @@ app.use(function (err, req, res) {
         message: 'Page Not Found',
     })
 })
+
+// connect to db
+
+mongoose.connection
+    .on(
+        'error',
+        console.error.bind(console, new Error('Database Connection Error!'))
+    )
+    .once('open', () => {
+        console.log(
+            chalk.red.italic(`    
+          💾 Database connected!
+        `)
+        )
+    })
 
 module.exports = app

@@ -3,23 +3,26 @@
 const router = require('express').Router()
 
 // Controllers
-const { addComment, likeComment, unlikeComment, getCommentByPostId } = require('../controllers/comment.controllers')
+const {
+    addComment,
+    likeComment,
+    unlikeComment,
+    getCommentByPostId,
+} = require('../controllers/comment.controllers')
 
 // Middleware
-const {
-    isAuth
-} = require('../middleware/isAuth')
+const { verifyToken } = require('../middleware/verifyToken')
 
 // get comment by post id
-router.get('/:id', isAuth, getCommentByPostId)
+router.get('/:id', verifyToken, getCommentByPostId)
 
 // add comment
-router.post('/', isAuth, addComment )
+router.post('/', verifyToken, addComment)
 
 // like comment
-router.put('/like', isAuth, likeComment )
+router.put('/like', verifyToken, likeComment)
 
 // unlike comment
-router.put('/unlike', isAuth, unlikeComment )
+router.put('/unlike', verifyToken, unlikeComment)
 
 module.exports = router

@@ -8,8 +8,6 @@
 const app = require('../app')
 const http = require('http')
 const chalk = require('chalk')
-const mongoose = require('../src/config/mongodb')
-
 
 /**
  * Get port from environment and store in Express.
@@ -18,16 +16,7 @@ const mongoose = require('../src/config/mongodb')
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
-/**
- * Database connections and Listen on provided port, on all network interfaces.
- */
-mongoose.connection
-    .on('error', console.error.bind(console, new Error('Database Connection Error!')))
-    .once('open', () => {
-        console.log(chalk.red.italic(`    
-          💾 Database connected!
-        `))
-    })
+
 
 /**
  * Create HTTP server.
