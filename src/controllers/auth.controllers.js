@@ -7,7 +7,7 @@ const debug = require('debug')('dev')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user.models')
 
-const refreshTokens = []
+let refreshTokens = [] // array of String token
 
 // create jwt token
 const createToken = (id, username) => {
@@ -18,10 +18,11 @@ const createToken = (id, username) => {
         },
         process.env.JWT_TOKEN_SECRET,
         {
-            expiresIn: '15m',
+            expiresIn: '15s',
         }
     )
 }
+
 // create jwt refresh token
 const createRefreshToken = (id, username) => {
     return jwt.sign(
@@ -31,6 +32,46 @@ const createRefreshToken = (id, username) => {
         },
         process.env.JWT_REFRESH_TOKEN_SECRET
     )
+}
+
+// refresh jwt token
+exports.refreshToken = (req, res) => {
+
+    const rToken = req.cookies.jwt
+ 
+    if (!rToken) {
+        return res.status(401).json({ error: 'Token is null' })
+    }
+    
+    if(!refreshTokens.includes(rToken)) {
+      return res.status(403).json({ error: 'Token is not valid or not exist!'})
+    }
+    
+    jwt.verify(rToken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, user)=> {
+      if(err){
+        return res.status(403).json({
+                error: 'Token is not valid!',
+            })
+      }
+      
+      // delete the old refreshToken
+      refreshTokens = refreshTokens.filter((token)=> token !== rToken)
+      
+      const newAccessToken = createToken(user.id, user.username)
+      const newRefreshToken = createRefreshToken(user.id, user.username)
+      refreshTokens.push(newRefreshToken)
+      
+      res.cookie('jwt', newRefreshToken, {
+            maxAge: 24 * 60 * 60 * 1000,
+            httpOnly: true,
+        })
+      
+      res.status(200).json({
+        accessToken: newAccessToken
+      })
+    })
+    
+    
 }
 
 /**
@@ -58,18 +99,19 @@ exports.userLogin = async (req, res) => {
             return res.status(422).json({ error: 'password is invalid' })
 
         // create cookie with jwt token
-        const token = createToken(user._id, user.username)
+        const accessToken = createToken(user._id, user.username)
         const refreshToken = createRefreshToken(user._id, user.username)
         refreshTokens.push(refreshToken)
 
-        res.cookie('jwt', token, {
+        res.cookie('jwt', refreshToken, {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true,
         })
 
-        // create current user
+        // send except password 
         const { password, ...rest } = user._doc
-        return res.json(rest)
+        
+        return res.json({...rest, accessToken, refreshToken})
     } catch (err) {
         debug(err)
         res.status(422).json({
@@ -157,16 +199,20 @@ exports.userRegister = async (req, res) => {
 
         // save new user to db
         const savedUser = await user.save()
-
+/*
         // create cookie with jwt token
-        const token = createToken(user._id, user.username)
-
-        res.cookie('jwt', token, {
+        const accessToken = createToken(user._id, user.username)
+        const refreshToken = createRefreshToken(user._id, user.username)
+        
+        // store refresh token
+        refreshTokens.push(refreshToken)
+        res.cookie('jwt', accessToken, {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true,
         })
+  */
 
-        res.json(savedUser)
+        res.json(savedUser) // redirect to /login
     } catch (err) {
         debug(err)
         res.status(422).json({
@@ -202,17 +248,4 @@ exports.isLoggedIn = async (req, res) => {
     }
 }
 
-// refresh jwt token
-exports.refreshToken = (req, res) => {
-    const authHeader = req.headers['authorization']
 
-    if (!authHeader) {
-        return res.status(401).json({ message: 'No token provided' })
-    }
-
-    const rToken = authHeader.split(' ')[1]
-    if (rToken === 'null') {
-        return res.status(401).json({ message: 'Token is null' })
-    }
-    res.send(200).json(rToken)
-}

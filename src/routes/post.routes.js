@@ -18,7 +18,7 @@ const { verifyToken } = require('../middleware/verifyToken')
 router.get('/del/:id', verifyToken, removePost)
 
 // get all user posts by userId
-router.get('/:userId', verifyToken, getUserPostById)
+router.get('/:userId', getUserPostById)
 
 // get post
 router.get('/', getPost)
