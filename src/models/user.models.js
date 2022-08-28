@@ -69,6 +69,12 @@ const userSchema = new Schema(
                 ref: 'Post',
             },
         ],
+        age: {
+            type: Number,
+        },
+        birthday: {
+            type: Date,
+        },
     },
     {
         timestamps: true,

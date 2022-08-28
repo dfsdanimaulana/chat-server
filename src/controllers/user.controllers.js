@@ -2,13 +2,14 @@
 
 // user models
 const User = require('../models/user.models')
+const debug = require('debug')('dev')
 
 // get all user in database
 exports.getUsers = async (req, res) => {
     try {
         const user = await User.find(
             {},
-            '_id username email gender desc followers following post img_thumb'
+            '_id username name email gender desc followers following post img_thumb'
         )
         res.status(200).json(user)
     } catch (err) {
@@ -19,48 +20,24 @@ exports.getUsers = async (req, res) => {
     }
 }
 
-/** When user login end */
-
-// update user by id
-
-exports.updateUserData = async (req, res) => {
+exports.updateUser = async (req, res) => {
     try {
-        const { id, queryString, data } = req.body
-        let query = {}
-        switch (queryString) {
-            case 'username':
-                // get all username's posts and update
-                query = {
-                    username: data,
-                }
-                break
-            case 'email':
-                query = {
-                    email: data,
-                }
-                break
-            case 'desc':
-                query = {
-                    desc: data,
-                }
-                break
-            default:
-                query = {}
-        }
-        const user = await User.findByIdAndUpdate(id, query, {
-            new: true,
-        })
-        if (!user) {
-            return res.status(404).json({
-                error: 'user not found',
-            })
-        }
-        res.json({
-            message: 'update Success',
-            user,
-        })
+        const { username, name, email, desc, gender, id } = req.body
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { username, name, email, desc, gender },
+            {
+                new: true,
+            }
+        )
+
+        const { password, createdAt, updatedAt, post, ...rest } =
+            updatedUser._doc
+
+        res.status(200).json(rest)
     } catch (err) {
-        debug({ err })
+        debug(err)
         res.status(404).json({
             error: err.message,
         })

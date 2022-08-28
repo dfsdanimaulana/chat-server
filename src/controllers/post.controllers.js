@@ -36,16 +36,14 @@ exports.addPost = async (req, res) => {
         // save post
         const savedPost = await post.save()
 
-        // loop every image and upload one by one
-        image.map(async (img) => {
+        // upload array of image one by one and save url to db
+        for (const img of image) {
             const uploadResponse = await cloudinary.uploader.upload(img, {
                 upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
             })
             await post.addImgPostId([uploadResponse.public_id])
-
-            // add img_post_url to post
             await post.addImgPostUrl([uploadResponse.secure_url])
-        })
+        }    
 
         // add hashtag to post
         if (arrHashtag.length > 0) {
@@ -61,7 +59,7 @@ exports.addPost = async (req, res) => {
     }
 }
 
-// menampilkan seluruh postingan
+// get all post
 exports.getPost = async (req, res) => {
     try {
         const data = await Post.find({})

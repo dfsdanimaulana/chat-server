@@ -4,13 +4,13 @@ const router = require('express').Router()
 
 const {
     getUsers,
-    updateUserData,
     removeUser,
     getUserWithPost,
     getUserById,
     follow,
     unFollow,
     followStatus,
+    updateUser,
 } = require('../controllers/user.controllers')
 
 const { verifyToken } = require('../middleware/verifyToken')
@@ -41,8 +41,7 @@ router.put('/follow', verifyToken, follow)
 router.put('/unfollow', verifyToken, unFollow)
 
 // update user
-router.put('/update', verifyToken, updateUserData)
-
+router.put('/update', verifyToken, updateUser)
 /** POST METHOD */
 
 module.exports = router
