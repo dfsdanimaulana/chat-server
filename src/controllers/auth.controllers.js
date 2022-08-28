@@ -18,7 +18,7 @@ const createToken = (id, username) => {
         },
         process.env.JWT_TOKEN_SECRET,
         {
-            expiresIn: '15s',
+            expiresIn: '15m',
         }
     )
 }
@@ -36,42 +36,41 @@ const createRefreshToken = (id, username) => {
 
 // refresh jwt token
 exports.refreshToken = (req, res) => {
-
     const rToken = req.cookies.jwt
- 
+
     if (!rToken) {
         return res.status(401).json({ error: 'Token is null' })
     }
-    
-    if(!refreshTokens.includes(rToken)) {
-      return res.status(403).json({ error: 'Token is not valid or not exist!'})
+
+    if (!refreshTokens.includes(rToken)) {
+        return res
+            .status(403)
+            .json({ error: 'Token is not valid or not exist!' })
     }
-    
-    jwt.verify(rToken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, user)=> {
-      if(err){
-        return res.status(403).json({
+
+    jwt.verify(rToken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({
                 error: 'Token is not valid!',
             })
-      }
-      
-      // delete the old refreshToken
-      refreshTokens = refreshTokens.filter((token)=> token !== rToken)
-      
-      const newAccessToken = createToken(user.id, user.username)
-      const newRefreshToken = createRefreshToken(user.id, user.username)
-      refreshTokens.push(newRefreshToken)
-      
-      res.cookie('jwt', newRefreshToken, {
+        }
+
+        // delete the old refreshToken
+        refreshTokens = refreshTokens.filter((token) => token !== rToken)
+
+        const newAccessToken = createToken(user.id, user.username)
+        const newRefreshToken = createRefreshToken(user.id, user.username)
+        refreshTokens.push(newRefreshToken)
+
+        res.cookie('jwt', newRefreshToken, {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true,
         })
-      
-      res.status(200).json({
-        accessToken: newAccessToken
-      })
+
+        res.status(200).json({
+            accessToken: newAccessToken,
+        })
     })
-    
-    
 }
 
 /**
@@ -83,7 +82,7 @@ exports.userLogin = async (req, res) => {
         // get user password by username
         const user = await User.findOne(
             isEmail(username) ? { email: username } : { username },
-            'username name password email desc followers following img_thumb img_bg'
+            'username name password email gender desc followers following img_thumb img_bg'
         )
         if (!user) {
             if (isEmail(username)) {
@@ -108,10 +107,10 @@ exports.userLogin = async (req, res) => {
             httpOnly: true,
         })
 
-        // send except password 
+        // send except password
         const { password, ...rest } = user._doc
-        
-        return res.json({...rest, accessToken, refreshToken})
+
+        return res.json({ ...rest, accessToken, refreshToken })
     } catch (err) {
         debug(err)
         res.status(422).json({
@@ -185,8 +184,10 @@ exports.userRegister = async (req, res) => {
         // set default user image profile
         let img_thumb
         gender === 'male'
-            ? (img_thumb = 'https://i.ibb.co/jkKCvyd/male-avatar.png')
-            : (img_thumb = 'https://i.ibb.co/sPWmJpy/female-avatar.png')
+            ? (img_thumb =
+                  'https://res.cloudinary.com/dfsdanimaulana/image/upload/v1661665020/thumbnails/male_avatar_kzr9sl.png')
+            : (img_thumb =
+                  'https://res.cloudinary.com/dfsdanimaulana/image/upload/v1661665008/thumbnails/female_avatar_tu9zdg.png')
 
         // initialize new user collection
         const user = new User({
@@ -199,7 +200,7 @@ exports.userRegister = async (req, res) => {
 
         // save new user to db
         const savedUser = await user.save()
-/*
+        /*
         // create cookie with jwt token
         const accessToken = createToken(user._id, user.username)
         const refreshToken = createRefreshToken(user._id, user.username)
@@ -247,5 +248,3 @@ exports.isLoggedIn = async (req, res) => {
         })
     }
 }
-
-
