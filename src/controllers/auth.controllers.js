@@ -73,6 +73,29 @@ exports.refreshToken = (req, res) => {
     })
 }
 
+// check if request is contain jwt cookies
+exports.isLoggedIn = async (req, res) => {
+    const { id, username } = req.user
+
+    try {
+        // get user password by username
+        const user = await User.findOne(
+            { username },
+            'username name email desc followers following img_thumb img_bg'
+        )
+        if (!user) {
+            return res.status(404).json({ error: 'username not found' })
+        }
+
+        res.status(200).json(user)
+    } catch (err) {
+        debug(err)
+        res.status(422).json({
+            error: err.message,
+        })
+    }
+}
+
 /**
  * when user login
  */
@@ -200,18 +223,6 @@ exports.userRegister = async (req, res) => {
 
         // save new user to db
         const savedUser = await user.save()
-        /*
-        // create cookie with jwt token
-        const accessToken = createToken(user._id, user.username)
-        const refreshToken = createRefreshToken(user._id, user.username)
-        
-        // store refresh token
-        refreshTokens.push(refreshToken)
-        res.cookie('jwt', accessToken, {
-            maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
-        })
-  */
 
         res.json(savedUser) // redirect to /login
     } catch (err) {
@@ -226,25 +237,4 @@ exports.userLogout = (req, res) => {
     res.send('logout user')
 }
 
-// check if request is contain jwt cookies
-exports.isLoggedIn = async (req, res) => {
-    const { id, username } = req.user
 
-    try {
-        // get user password by username
-        const user = await User.findOne(
-            { username },
-            'username name email desc followers following img_thumb img_bg'
-        )
-        if (!user) {
-            return res.status(404).json({ error: 'username not found' })
-        }
-
-        res.status(200).json(user)
-    } catch (err) {
-        debug(err)
-        res.status(422).json({
-            error: err.message,
-        })
-    }
-}
