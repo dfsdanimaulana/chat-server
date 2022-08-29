@@ -12,6 +12,10 @@ const postSchema = new Schema(
             ref: 'User',
             required: true,
         },
+        uniqueId: {
+          type: String,
+          unique: true,
+        },
         img_post_id: [
             {
                 type: String,

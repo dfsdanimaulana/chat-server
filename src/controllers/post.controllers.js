@@ -3,23 +3,29 @@
 const debug = require('debug')('dev')
 const { cloudinary } = require('../config/cloudinary')
 const Post = require('../models/post.models')
+const { isAlpha } = require('validator')
 
 // create new post
 exports.addPost = async (req, res) => {
-    const { userId, caption, hashtag, image } = req.body
+    const { userId, caption, hashtag, image, uniqueId } = req.body
     // cek caption length
 
     if (caption.length > 100) {
-        return res.json({ error: 'caption must be less than 100 character' })
+        return res.status(400).json({ error: 'caption must be less than 100 character' })
     }
 
+    // uniqueId must be only alphabet
+    if(!isAlpha(uniqueId)){
+        return res.status(400).json({ error: 'uniqueId must only contain alphabet' })
+    }
+    
     // handle hashtag
     const arrHashtag = []
 
     if (hashtag) {
         // format string hashtag to array
         const hashtags = hashtag.split(' ')
-        hashtags.map((val) => arrHashtag.push(val))
+        hashtags.filter((val) => val !== '').map((val) => arrHashtag.push(val))
     }
 
     /**
@@ -31,6 +37,7 @@ exports.addPost = async (req, res) => {
         const post = new Post({
             user: userId,
             caption,
+            uniqueId,
         })
 
         // save post
