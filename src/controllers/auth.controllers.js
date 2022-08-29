@@ -156,6 +156,11 @@ exports.userRegister = async (req, res) => {
             error: ['username required'],
         })
     }
+    if (password !== confirm_password) {
+        return res.status(422).json({
+            error: ['wrong confirm password!'],
+        })
+    }
 
     //cek if username valid
     !isLength(username, {
@@ -188,8 +193,6 @@ exports.userRegister = async (req, res) => {
     if (password.length < 6) {
         error.push('password must be more than 6 characters')
     }
-    // cek confirm password
-    password !== confirm_password && error.push('confirm password not match')
 
     // send error if exist
     if (error.length > 0) {
@@ -237,4 +240,71 @@ exports.userLogout = (req, res) => {
     res.send('logout user')
 }
 
+// change password
+exports.changeUserPassword = async (req, res) => {
+    const { _id, password_old, password_new, password_new_confirm } = req.body
 
+    try {
+        // get user old password
+        const user = await User.findById(_id, 'password')
+        if (!user) {
+            return res.status(422).json({
+                error: ['User not found!'],
+            })
+        }
+
+        // check old password
+        const isValid = await compare(password_old, user.password)
+        if (!isValid) {
+            return res.status(422).json({
+                error: ['Invalid old password!'],
+            })
+        }
+
+        /**  validate password */
+
+        // cek if password exists
+        if (!password_old || !password_new || !password_new_confirm) {
+            return res.status(422).json({
+                error: ['password required'],
+            })
+        }
+
+        if (password_new !== password_new_confirm) {
+            return res.status(422).json({
+                error: ['wrong confirm password!'],
+            })
+        }
+
+        const error = []
+
+        // cek password length
+        if (password_new.length < 6) {
+            error.push('password must be more than 6 characters')
+        }
+
+        // send error if exist
+        if (error.length > 0) {
+            return res.status(422).json({
+                error,
+            })
+        }
+
+        // hash new password
+        // hash password
+        let hashedPassword
+        const salt = await genSalt()
+        hashedPassword = await hash(password_new, salt)
+
+        await User.findByIdAndUpdate(_id, {
+            password: hashedPassword,
+        })
+
+        res.status(200).json({ message: 'Password updated!' })
+    } catch (err) {
+        debug(err)
+        res.status(422).json({
+            error: [err.message],
+        })
+    }
+}

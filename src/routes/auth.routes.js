@@ -6,13 +6,15 @@ const {
     userLogout,
     userRegister,
     isLoggedIn,
-    refreshToken
+    refreshToken,
+    changeUserPassword,
 } = require('../controllers/auth.controllers')
 const { verifyToken } = require('../middleware/verifyToken')
 
+router.post('/change_password', verifyToken, changeUserPassword)
 router.post('/login', userLogin)
 router.post('/register', userRegister)
-router.post('/logout', userLogout)
+router.post('/logout', verifyToken, userLogout)
 router.get('/refresh', refreshToken)
 router.get('/', verifyToken, isLoggedIn)
 

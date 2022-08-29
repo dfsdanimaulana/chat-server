@@ -7,8 +7,8 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "username":"guest",
-    "password":"123456"
+    "username":"novi",
+    "password":"1234567"
 }
 
 ###
@@ -26,6 +26,20 @@ Content-Type: application/json
 ###
 
 GET {{base}}/auth
+
 ###
 
 POST {{base}}/auth/refresh
+
+###
+// register
+POST {{base}}/auth/change_password
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "_id": "6309004712cdf2e74d1e4577",
+    "password_old": "123456",
+    "password_new": "1234567",
+    "password_new_confirm": "1234567"
+}

@@ -49,7 +49,7 @@ GET {{base}}/user/follow-status
 // update user data by id
 PUT {{base}}/user/update
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMDg4Y2RjNDRhN2QwNTljYTEwNDA5NCIsInVzZXJuYW1lIjoiZ3Vlc3QiLCJpYXQiOjE2NjE2ODgzMDYsImV4cCI6MTY2MTY4OTIwNn0.fqrZNQkJP-nB5WwqTj41iknhsDLtEWDtMol-XqCNKxc
+Authorization: Bearer {{token}}
 
 {
     "id":"63088cdc44a7d059ca104094",
