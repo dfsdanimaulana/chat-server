@@ -11,14 +11,18 @@ exports.addPost = async (req, res) => {
     // cek caption length
 
     if (caption.length > 100) {
-        return res.status(400).json({ error: 'caption must be less than 100 character' })
+        return res
+            .status(400)
+            .json({ error: 'caption must be less than 100 character' })
     }
 
     // uniqueId must be only alphabet
-    if(!isAlpha(uniqueId)){
-        return res.status(400).json({ error: 'uniqueId must only contain alphabet' })
+    if (!isAlpha(uniqueId)) {
+        return res
+            .status(400)
+            .json({ error: 'uniqueId must only contain alphabet' })
     }
-    
+
     // handle hashtag
     const arrHashtag = []
 
@@ -50,7 +54,7 @@ exports.addPost = async (req, res) => {
             })
             await post.addImgPostId([uploadResponse.public_id])
             await post.addImgPostUrl([uploadResponse.secure_url])
-        }    
+        }
 
         // add hashtag to post
         if (arrHashtag.length > 0) {
@@ -111,30 +115,35 @@ exports.updatePostCaption = (req, res) => {
     }
 }
 
-exports.removePost = async (req, res) => {
+exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params
-        const query = await Post.findByIdAndDelete(id)
-        res.json({ message: 'post removed', query })
+        await Post.findByIdAndDelete(id)
+
+        // delete image in cloudinary
+        // remove post id in user post filed
+        // remove post id in user saved post field
+        
+        res.json({ message: 'post deleted!' })
     } catch (error) {
         debug({ error })
-        res.status(400).send(error)
+        res.status(400).json({ error: error.message })
     }
 }
 
 // get all user post by userid
 exports.getUserPostById = async (req, res) => {
-  try {
-      const { userId } = req.params
-      const userPosts = await Post.find({user: userId})
-                  .sort({createdAt: -1})
-                  .populate({
-                    path: 'user',
-                    select: 'username img_thumb'
-                  })
-      res.status(200).json(userPosts)
-  } catch (err) {
-    debug({err})
-    res.status(400).json({error: err.message})
-  }
+    try {
+        const { userId } = req.params
+        const userPosts = await Post.find({ user: userId })
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'user',
+                select: 'username img_thumb',
+            })
+        res.status(200).json(userPosts)
+    } catch (err) {
+        debug({ err })
+        res.status(400).json({ error: err.message })
+    }
 }

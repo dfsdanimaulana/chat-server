@@ -7,7 +7,7 @@ const {
     getPost,
     addPost,
     updatePostCaption,
-    removePost,
+    deletePost,
     getUserPostById,
 } = require('../controllers/post.controllers')
 
@@ -15,7 +15,7 @@ const {
 const { verifyToken } = require('../middleware/verifyToken')
 
 // delete post
-router.get('/del/:id', verifyToken, removePost)
+router.delete('/:id', verifyToken, deletePost)
 
 // get all user posts by userId
 router.get('/:userId', getUserPostById)
