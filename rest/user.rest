@@ -7,6 +7,22 @@ GET {{base}}/user
 GET {{base}}/user/63049de40a8779bd2b154792
 
 ###
+// update user data by id
+PUT {{base}}/user/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "id":"63088cdc44a7d059ca104094",
+    "username": "guest",
+    "name": "guest",
+    "email": "guests@gmail",
+    "desc": "jsut edit",
+    "gender": "female"
+    
+}
+
+###
 
 // get all user's post
 GET {{base}}/user/post
@@ -45,19 +61,4 @@ Content-Type: application/json
 // Menampilkan followers dan following user
 GET {{base}}/user/follow-status
 
-###
-// update user data by id
-PUT {{base}}/user/update
-Content-Type: application/json
-Authorization: Bearer {{token}}
 
-{
-    "id":"63088cdc44a7d059ca104094",
-    "username": "guest",
-    "name": "guest",
-    "email": "guests@gmail",
-    "desc": "jsut edit",
-    "gender": "female"
-    
-    
-}

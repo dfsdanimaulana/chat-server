@@ -1,15 +1,17 @@
 // check isloggedin
 GET {{base}}/auth
 
+
 ###
 // login
 POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "username":"novi",
-    "password":"1234567"
+    "username":"guest",
+    "password":"123456"
 }
+
 
 ###
 // register
@@ -23,16 +25,16 @@ Content-Type: application/json
     "password":"123456",
     "confirm_password":"123456"
 }
-###
 
-GET {{base}}/auth
 
 ###
-
+// refresh token require refresh token from cookie
 POST {{base}}/auth/refresh
+Authorization: Bearer {{token}}
+
 
 ###
-// register
+// change user password
 POST {{base}}/auth/change_password
 Content-Type: application/json
 Authorization: Bearer {{token}}

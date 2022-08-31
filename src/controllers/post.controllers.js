@@ -8,8 +8,12 @@ const { isAlpha } = require('validator')
 // create new post
 exports.addPost = async (req, res) => {
     const { userId, caption, hashtag, image, uniqueId } = req.body
-    // cek caption length
 
+    // check if image is not empty
+    if (!image || image.length < 1) {
+        return res.status(400).json({ error: 'please select an image' })
+    }
+    // cek caption length
     if (caption.length > 100) {
         return res
             .status(400)
@@ -32,10 +36,7 @@ exports.addPost = async (req, res) => {
         hashtags.filter((val) => val !== '').map((val) => arrHashtag.push(val))
     }
 
-    /**
-     * array is not pushed when try to add to db
-     * solved by put addImgPostId addImgPostUrl inside map
-     */
+    
     try {
         // create new post
         const post = new Post({
@@ -119,15 +120,15 @@ exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params
         const deletedPost = await Post.findByIdAndDelete(id)
-        if(!deletedPost) {
-          res.status(404).json({error: 'Post not found!'})
+        if (!deletedPost) {
+            res.status(404).json({ error: 'Post not found!' })
         }
-        
+
         const publicId = deletedPost.img_post_id
         // delete image in cloudinary
         // remove post id in user post filed
         // remove post id in user saved post field
-        
+
         res.json({ message: 'post deleted!', publicId })
     } catch (error) {
         debug({ error })

@@ -1,35 +1,6 @@
 
 ###
 
-// Menambah postingan baru
-POST http://localhost:3003/post
-Content-Type: application/json
-
-{
-    "userId":"63049de40a8779bd2b154792",
-    "caption":"im testing upload multiple images",
-    "hashtag":"multiple image"
-}
-
-###
-
-// Menampilkan seluruh postingan
-GET {{base}}/post
-###
-
-// Menghapus postingan by id
-GET http://localhost:3003/post/del/615d1be22cp242c8c2dada05
-
-###
 
 
 
-// menambahkan comment pada postingan
-POST http://localhost:3003/comment
-Content-Type: application/json
-
-{
-    "senderId":"6163265da411a2c92c2a17c5",
-    "postId":"616391d3092ed15a300fc6ea",
-    "msg":"third comment"
-}

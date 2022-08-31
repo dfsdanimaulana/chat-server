@@ -1,0 +1,9 @@
+// menambahkan comment pada postingan
+POST {{base}}/comment
+Content-Type: application/json
+
+{
+    "senderId":"6163265da411a2c92c2a17c5",
+    "postId":"616391d3092ed15a300fc6ea",
+    "msg":"third comment"
+}

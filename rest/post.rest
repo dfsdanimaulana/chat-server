@@ -1,0 +1,20 @@
+###
+// get all post
+GET {{base}}/post
+
+###
+// create new post
+POST {{base}}/post
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "userId":"63049de40a8779bd2b154792",
+    "uniqueId": "kjhbdsbfdsbfbdsfkhdfjs",
+    "caption":"im testing upload multiple images",
+    "hashtag":"multiple image"
+}
+
+// delete post by id
+DELETE {{base}}/post/615d1be22cp242c8c2dada05
+
