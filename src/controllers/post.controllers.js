@@ -118,13 +118,17 @@ exports.updatePostCaption = (req, res) => {
 exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params
-        await Post.findByIdAndDelete(id)
-
+        const deletedPost = await Post.findByIdAndDelete(id)
+        if(!deletedPost) {
+          res.status(404).json({error: 'Post not found!'})
+        }
+        
+        const publicId = deletedPost.img_post_id
         // delete image in cloudinary
         // remove post id in user post filed
         // remove post id in user saved post field
         
-        res.json({ message: 'post deleted!' })
+        res.json({ message: 'post deleted!', publicId })
     } catch (error) {
         debug({ error })
         res.status(400).json({ error: error.message })
