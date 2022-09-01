@@ -15,6 +15,9 @@ Authorization: Bearer {{token}}
     "hashtag":"multiple image"
 }
 
+###
+
 // delete post by id
-DELETE {{base}}/post/615d1be22cp242c8c2dada05
+DELETE {{base}}/post/630cfefea60269f120d38c9a
+Authorization: Bearer {{token}}
 

@@ -4,15 +4,17 @@ const debug = require('debug')('dev')
 const { cloudinary } = require('../config/cloudinary')
 const Post = require('../models/post.models')
 const { isAlpha } = require('validator')
+const User = require('../models/user.models')
 
 // create new post
-exports.addPost = async (req, res) => {
+exports.createNewPost = async (req, res) => {
     const { userId, caption, hashtag, image, uniqueId } = req.body
 
     // check if image is not empty
     if (!image || image.length < 1) {
         return res.status(400).json({ error: 'please select an image' })
     }
+
     // cek caption length
     if (caption.length > 100) {
         return res
@@ -36,7 +38,6 @@ exports.addPost = async (req, res) => {
         hashtags.filter((val) => val !== '').map((val) => arrHashtag.push(val))
     }
 
-    
     try {
         // create new post
         const post = new Post({
@@ -119,24 +120,36 @@ exports.updatePostCaption = (req, res) => {
 exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params
+
         const deletedPost = await Post.findByIdAndDelete(id)
         if (!deletedPost) {
             res.status(404).json({ error: 'Post not found!' })
         }
 
         const publicId = deletedPost.img_post_id
+
         // delete image in cloudinary
+        for (const pbId of publicId) {
+            await cloudinary.uploader.destroy(pbId)
+        }
+
         // remove post id in user post filed
+        const userId = deletedPost.user._id
+        await User.findByIdAndUpdate(userId, {
+            $pull: {
+                post: id,
+            },
+        })
         // remove post id in user saved post field
 
-        res.json({ message: 'post deleted!', publicId })
+        res.json({ message: 'post deleted!' })
     } catch (error) {
         debug({ error })
         res.status(400).json({ error: error.message })
     }
 }
 
-// get all user post by userid
+// get all user post by userId
 exports.getUserPostById = async (req, res) => {
     try {
         const { userId } = req.params

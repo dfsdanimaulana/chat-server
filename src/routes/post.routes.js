@@ -5,7 +5,7 @@ const router = require('express').Router()
 // post controller
 const {
     getPost,
-    addPost,
+    createNewPost,
     updatePostCaption,
     deletePost,
     getUserPostById,
@@ -24,7 +24,7 @@ router.get('/:userId', getUserPostById)
 router.get('/', getPost)
 
 // Add post
-router.post('/', verifyToken, addPost)
+router.post('/', verifyToken, createNewPost)
 
 // update post
 router.put('/', verifyToken, updatePostCaption)
