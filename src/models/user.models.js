@@ -69,6 +69,12 @@ const userSchema = new Schema(
                 ref: 'Post',
             },
         ],
+        savedPost: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Post',
+            },
+        ],
         age: {
             type: Number,
         },

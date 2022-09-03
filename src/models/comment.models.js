@@ -21,13 +21,18 @@ const postCommentSchema = new Schema(
         },
         msg: {
             type: String,
-            maxlength: [100, 'message must be less than 100 character'],
             default: 'No Message',
         },
         like: [
             {
                 type: Schema.Types.ObjectId,
                 ref: 'User',
+            },
+        ],
+        replay: [
+            {
+                sender: String,
+                msg: String,
             },
         ],
     },

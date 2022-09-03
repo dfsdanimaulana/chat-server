@@ -5,6 +5,7 @@ const { cloudinary } = require('../config/cloudinary')
 const Post = require('../models/post.models')
 const { isAlpha } = require('validator')
 const User = require('../models/user.models')
+const PostComment = require('../models/comment.models')
 
 // create new post
 exports.createNewPost = async (req, res) => {
@@ -140,7 +141,14 @@ exports.deletePost = async (req, res) => {
                 post: id,
             },
         })
-        // remove post id in user saved post field
+
+        // remove post id in user savedPost field
+        // code here ....
+
+        // remove comments in deleted post
+        await PostComment.deleteMany({
+            postId: id,
+        })
 
         res.json({ message: 'post deleted!' })
     } catch (error) {

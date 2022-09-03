@@ -1,9 +1,28 @@
 'use strict'
 
 const PostComment = require('../models/comment.models')
-const Post = require('../models/post.models')
 const debug = require('debug')('dev')
 
+// get all comment
+exports.getComments = async (req, res) => {
+    try {
+        const comments = await PostComment.find()
+            .populate({
+                path: 'sender',
+                select: 'username img_thumb',
+            })
+            .sort({ createdAt: -1 })
+
+        res.status(200).json(comments)
+    } catch (err) {
+        debug(err)
+        res.status(422).json({
+            error: err.message,
+        })
+    }
+}
+
+// create new comment
 exports.addComment = async (req, res) => {
     try {
         const { senderId, postId, msg } = req.body
@@ -32,20 +51,16 @@ exports.addComment = async (req, res) => {
     }
 }
 
+// get comment by post id
 exports.getCommentByPostId = async (req, res) => {
     try {
         const postId = req.params.id
 
-        // const data = await Post.findById(postId, 'comment').populate({
-        //     path: 'comment',
-        //     populate: {
-        //         path: 'sender',
-        //         select: 'username img_thumb',
-        //     },
-        // })
-
         const data = await PostComment.find({
-            postId
+            postId,
+        }).populate({
+            path: 'sender',
+            select: 'username img_thumb',
         })
 
         res.json(data)
