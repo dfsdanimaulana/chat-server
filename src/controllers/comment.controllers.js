@@ -4,46 +4,54 @@ const PostComment = require('../models/comment.models')
 const Post = require('../models/post.models')
 const debug = require('debug')('dev')
 
-exports.addComment = (req, res) => {
-    const { senderId, postId, msg } = req.body
+exports.addComment = async (req, res) => {
+    try {
+        const { senderId, postId, msg } = req.body
 
-    if (!senderId || !postId || !msg) {
-        return res.status(400).json({ error: 'data not complete' })
+        if (!senderId || !postId || !msg) {
+            return res.status(400).json({ error: 'data not complete' })
+        }
+
+        const comment = new PostComment({
+            sender: senderId,
+            msg,
+            postId,
+        })
+
+        // save comment
+        await comment.save()
+        // add saved comment id to post comment array
+        await comment.addCommentToPost(postId)
+
+        res.json({ message: 'comment added' })
+    } catch (err) {
+        debug(err)
+        res.status(422).json({
+            error: err.message,
+        })
     }
-
-    const comment = new PostComment({
-        sender: senderId,
-        msg,
-    })
-
-    comment.save(async (error, result) => {
-        if (error) {
-            return res.status(400).json({ error: error.message })
-        }
-        const saveComment = await comment.addCommentToPost(postId)
-        if (!saveComment) {
-            return res.status(400).json({ error: 'failed to add comment' })
-        }
-        res.json({ message: 'comment added', result })
-    })
 }
 
 exports.getCommentByPostId = async (req, res) => {
     try {
-        const  postId  = req.params.id
-        debug({postId})
-        const data = await Post.findById(postId, 'comment').populate({
-            path: 'comment',
-            populate: {
-                path: 'sender',
-                select: 'username img_thumb'
-            }
+        const postId = req.params.id
+
+        // const data = await Post.findById(postId, 'comment').populate({
+        //     path: 'comment',
+        //     populate: {
+        //         path: 'sender',
+        //         select: 'username img_thumb',
+        //     },
+        // })
+
+        const data = await PostComment.find({
+            postId
         })
-        debug(data.comment[0].sender)
+
         res.json(data)
     } catch (error) {
         debug(error)
-        res.status(400).json({error:error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 

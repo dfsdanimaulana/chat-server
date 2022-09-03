@@ -14,7 +14,7 @@ const {
 const { verifyToken } = require('../middleware/verifyToken')
 
 // get comment by post id
-router.get('/:id', verifyToken, getCommentByPostId)
+router.get('/:id', getCommentByPostId)
 
 // add comment
 router.post('/', verifyToken, addComment)

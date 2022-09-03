@@ -11,19 +11,25 @@ const postCommentSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
         },
+        postId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Post',
+        },
         timeSend: {
             type: String,
             default: moment().format('hh:mm A'),
         },
         msg: {
             type: String,
-            maxlength: [100,'message must be less than 100 character'],
+            maxlength: [100, 'message must be less than 100 character'],
             default: 'No Message',
         },
-        like: [{
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-        }],
+        like: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        ],
     },
     {
         timestamps: true,

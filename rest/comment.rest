@@ -1,9 +1,15 @@
-// menambahkan comment pada postingan
+// add new comment
 POST {{base}}/comment
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "senderId":"6163265da411a2c92c2a17c5",
-    "postId":"616391d3092ed15a300fc6ea",
-    "msg":"third comment"
+    "senderId":"630c7ed3a60269f120d38bee",
+    "postId":"63130708a89e968bfba989f8",
+    "msg":"try comment one"
 }
+
+###
+// get comment by post id
+GET {{base}}/comment/63130708a89e968bfba989f8
+Authorization: Bearer {{token}}
