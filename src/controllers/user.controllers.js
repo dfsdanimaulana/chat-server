@@ -3,13 +3,14 @@
 // user models
 const User = require('../models/user.models')
 const debug = require('debug')('dev')
+const { cloudinary } = require('../config/cloudinary')
 
 // get all user in database
 exports.getUsers = async (req, res) => {
     try {
         const user = await User.find(
             {},
-            '_id username name email gender desc followers following post img_thumb'
+            '_id username name email gender desc followers following post img_thumb img_thumb_id'
         )
         res.status(200).json(user)
     } catch (err) {
@@ -20,6 +21,7 @@ exports.getUsers = async (req, res) => {
     }
 }
 
+// update user data
 exports.updateUser = async (req, res) => {
     try {
         const { username, name, email, desc, gender, _id } = req.body
@@ -42,6 +44,39 @@ exports.updateUser = async (req, res) => {
             error: err.message,
         })
     }
+}
+
+// update user profile picture 
+exports.updateProfilePic = async (req, res) => {
+  try {
+    const { image, id, publicId } = req.body
+    
+    if(!image || !id ) {
+        return res.status(400).json({error: 'data not complete'})
+    }
+    
+    // remove old pic in cloudinary
+    if(publicId && publicId !== 'new') {
+      await cloudinary.uploader.destroy(publicId)
+    }
+    
+    // upload to cloudinary
+    const uploadResponse = await cloudinary.uploader.upload(image, {
+                upload_preset: process.env.CLOUDINARY_UPLOAD_PIC,
+            })
+    
+    await User.findByIdAndUpdate(id, {
+      img_thumb: uploadResponse.secure_url,
+      img_thumb_id: uploadResponse.public_id
+    })
+    
+    res.status(200).json({message: 'Update success', img_thumb: uploadResponse.secure_url })
+  } catch (err) {
+    debug(err)
+        res.status(404).json({
+            error: err.message,
+        })
+  }
 }
 
 // remove user by id

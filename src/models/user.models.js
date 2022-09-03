@@ -26,6 +26,10 @@ const userSchema = new Schema(
             type: String,
             default: 'https://i.ibb.co/jkKCvyd/male-avatar.png',
         },
+        img_thumb_id: {
+            type: String,
+            default: 'new'
+        },
         img_bg: {
             type: String,
             default: 'https://source.unsplash.com/random/400x200',

@@ -81,7 +81,7 @@ exports.isLoggedIn = async (req, res) => {
         // get user password by username
         const user = await User.findOne(
             { username },
-            'username name email desc followers following img_thumb img_bg'
+            'username name email desc followers following img_thumb img_thumb_id img_bg'
         )
         if (!user) {
             return res.status(404).json({ error: 'username not found' })
@@ -105,7 +105,7 @@ exports.userLogin = async (req, res) => {
         // get user password by username
         const user = await User.findOne(
             isEmail(username) ? { email: username } : { username },
-            'username name password email gender desc followers following img_thumb img_bg'
+            'username name password email gender desc followers following img_thumb img_thumb_id img_bg'
         )
         if (!user) {
             if (isEmail(username)) {

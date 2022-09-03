@@ -11,6 +11,7 @@ const {
     unFollow,
     followStatus,
     updateUser,
+    updateProfilePic
 } = require('../controllers/user.controllers')
 
 const { verifyToken } = require('../middleware/verifyToken')
@@ -39,6 +40,9 @@ router.put('/follow', verifyToken, follow)
 
 // unfollow
 router.put('/unfollow', verifyToken, unFollow)
+
+// update user
+router.put('/update/image', verifyToken, updateProfilePic)
 
 // update user
 router.put('/update', verifyToken, updateUser)

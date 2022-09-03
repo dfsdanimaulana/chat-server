@@ -53,7 +53,7 @@ exports.createNewPost = async (req, res) => {
         // upload array of image one by one and save url to db
         for (const img of image) {
             const uploadResponse = await cloudinary.uploader.upload(img, {
-                upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
+                upload_preset: process.env.CLOUDINARY_UPLOAD_POST,
             })
             await post.addImgPostId([uploadResponse.public_id])
             await post.addImgPostUrl([uploadResponse.secure_url])
