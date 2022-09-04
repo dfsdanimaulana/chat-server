@@ -7,6 +7,34 @@ const { isAlpha } = require('validator')
 const User = require('../models/user.models')
 const PostComment = require('../models/comment.models')
 
+// get all post
+exports.getPost = async (req, res) => {
+    try {
+        const data = await Post.find({})
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'user',
+                select: 'username img_thumb',
+            })
+            .populate({
+                path: 'comment',
+                select: 'sender timeSend like msg',
+                populate: {
+                    path: 'sender',
+                    select: 'username img_thumb',
+                },
+            })
+            .populate({
+                path: 'like',
+                select: 'username img_thumb'
+            })
+        res.json(data)
+    } catch (error) {
+        debug({ error })
+        res.status(404).json({ error: error.message })
+    }
+}
+
 // create new post
 exports.createNewPost = async (req, res) => {
     const { userId, caption, hashtag, image, uniqueId } = req.body
@@ -70,30 +98,6 @@ exports.createNewPost = async (req, res) => {
         res.status(200).json({ message: 'posted!', data: savedPost })
     } catch (err) {
         res.status(400).json({ error: 'failed add post to user post', err })
-    }
-}
-
-// get all post
-exports.getPost = async (req, res) => {
-    try {
-        const data = await Post.find({})
-            .sort({ createdAt: -1 })
-            .populate({
-                path: 'user',
-                select: 'username img_thumb',
-            })
-            .populate({
-                path: 'comment',
-                select: 'sender timeSend like msg',
-                populate: {
-                    path: 'sender',
-                    select: 'username img_thumb',
-                },
-            })
-        res.json(data)
-    } catch (error) {
-        debug({ error })
-        res.status(404).json({ error: error.message })
     }
 }
 
@@ -168,6 +172,34 @@ exports.getUserPostById = async (req, res) => {
                 select: 'username img_thumb',
             })
         res.status(200).json(userPosts)
+    } catch (err) {
+        debug({ err })
+        res.status(400).json({ error: err.message })
+    }
+}
+
+// toggle post like
+exports.togglePostLike = async (req, res) => {
+    try {
+        const { userId, postId } = req.body
+
+        if (!userId || !postId) {
+            return res
+                .status(400)
+                .json({ error: 'postId and userId required!' })
+        }
+
+        // check if user already like the post or not
+        const postLike = await Post.findById(postId, 'like')
+        if (postLike.like.includes(userId)) {
+            // unlike post
+            await postLike.unlikePost(userId)
+            res.status(200).json({ message: 'unlike success' })
+        } else {
+            // like post
+            await postLike.likePost([userId])
+            res.status(200).json({ message: 'like success' })
+        }
     } catch (err) {
         debug({ err })
         res.status(400).json({ error: err.message })

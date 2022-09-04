@@ -13,8 +13,8 @@ const postSchema = new Schema(
             required: true,
         },
         uniqueId: {
-          type: String,
-          unique: true,
+            type: String,
+            unique: true,
         },
         img_post_id: [
             {
@@ -29,10 +29,6 @@ const postSchema = new Schema(
         timeSend: {
             type: String,
             default: moment().format('hh:mm A'),
-        },
-        isLiked: {
-            type: Boolean,
-            default: false,
         },
         caption: {
             type: String,
@@ -53,9 +49,9 @@ const postSchema = new Schema(
         ],
         like: [
             {
-              type: Schema.Types.ObjectId,
-              ref: 'User',
-            }
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            },
         ],
     },
     {
@@ -114,6 +110,31 @@ postSchema.methods.addImgPostUrl = function (arr) {
                 img_post_url: {
                     $each: arr,
                 },
+            },
+        }
+    )
+}
+
+// add user id to like array
+postSchema.methods.likePost = function (arr) {
+    return Post.updateOne(
+        { _id: this.id },
+        {
+            $addToSet: {
+                like: {
+                    $each: arr,
+                },
+            },
+        }
+    )
+}
+// remove user id to like array
+postSchema.methods.unlikePost = function (userId) {
+    return Post.updateOne(
+        { _id: this.id },
+        {
+            $pull: {
+                like: userId,
             },
         }
     )

@@ -9,6 +9,7 @@ const {
     updatePostCaption,
     deletePost,
     getUserPostById,
+    togglePostLike,
 } = require('../controllers/post.controllers')
 
 // Middleware
@@ -22,6 +23,9 @@ router.get('/:userId', getUserPostById)
 
 // get post
 router.get('/', getPost)
+
+// toggle like and unlike post
+router.post('/like', verifyToken, togglePostLike)
 
 // Add post
 router.post('/', verifyToken, createNewPost)
