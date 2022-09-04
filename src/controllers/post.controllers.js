@@ -171,6 +171,10 @@ exports.getUserPostById = async (req, res) => {
                 path: 'user',
                 select: 'username img_thumb',
             })
+            .populate({
+                path: 'like',
+                select: 'username img_thumb'
+            })         
         res.status(200).json(userPosts)
     } catch (err) {
         debug({ err })
