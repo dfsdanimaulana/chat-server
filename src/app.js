@@ -4,7 +4,7 @@ const express = require('express')
 const createError = require('http-errors')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const mongoose = require('./src/config/mongodb')
+const mongoose = require('./config/mongodb')
 const chalk = require('chalk')
 require('dotenv').config()
 
@@ -27,10 +27,10 @@ app.use(
 app.use(cookieParser())
 
 // Routes
-app.use('/auth', require('./src/routes/auth.routes'))
-app.use('/user', require('./src/routes/user.routes'))
-app.use('/post', require('./src/routes/post.routes'))
-app.use('/comment', require('./src/routes/comment.routes'))
+app.use('/auth', require('./routes/auth.routes'))
+app.use('/user', require('./routes/user.routes'))
+app.use('/post', require('./routes/post.routes'))
+app.use('/comment', require('./routes/comment.routes'))
 
 app.use('/', (req, res) => {
     res.json({
