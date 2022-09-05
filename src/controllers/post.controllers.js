@@ -26,7 +26,7 @@ exports.getPost = async (req, res) => {
             })
             .populate({
                 path: 'like',
-                select: 'username img_thumb'
+                select: 'username img_thumb',
             })
         res.json(data)
     } catch (error) {
@@ -173,8 +173,8 @@ exports.getUserPostById = async (req, res) => {
             })
             .populate({
                 path: 'like',
-                select: 'username img_thumb'
-            })         
+                select: 'username img_thumb',
+            })
         res.status(200).json(userPosts)
     } catch (err) {
         debug({ err })

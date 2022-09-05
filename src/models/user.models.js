@@ -28,7 +28,7 @@ const userSchema = new Schema(
         },
         img_thumb_id: {
             type: String,
-            default: 'new'
+            default: 'new',
         },
         img_bg: {
             type: String,

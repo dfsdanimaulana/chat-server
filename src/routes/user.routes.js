@@ -11,7 +11,7 @@ const {
     unFollow,
     followStatus,
     updateUser,
-    updateProfilePic
+    updateProfilePic,
 } = require('../controllers/user.controllers')
 
 const { verifyToken } = require('../middleware/verifyToken')
