@@ -7,7 +7,7 @@ const {
     userRegister,
     isLoggedIn,
     refreshToken,
-    changeUserPassword,
+    changeUserPassword
 } = require('../controllers/auth.controllers')
 const { verifyToken } = require('../middleware/verifyToken')
 

@@ -9,7 +9,11 @@ exports.getComments = async (req, res) => {
         const comments = await PostComment.find()
             .populate({
                 path: 'sender',
-                select: 'username img_thumb',
+                select: 'username img_thumb'
+            })
+            .populate({
+                path: 'like',
+                select: 'username img_thumb'
             })
             .sort({ createdAt: -1 })
 
@@ -17,7 +21,7 @@ exports.getComments = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(422).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -34,7 +38,7 @@ exports.addComment = async (req, res) => {
         const comment = new PostComment({
             sender: senderId,
             msg,
-            postId,
+            postId
         })
 
         // save comment
@@ -46,7 +50,7 @@ exports.addComment = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(422).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -57,10 +61,10 @@ exports.getCommentByPostId = async (req, res) => {
         const postId = req.params.id
 
         const data = await PostComment.find({
-            postId,
+            postId
         }).populate({
             path: 'sender',
-            select: 'username img_thumb',
+            select: 'username img_thumb'
         })
 
         res.json(data)
@@ -77,9 +81,9 @@ exports.likeComment = (req, res, next) => {
         const addLike = PostComment.findByIdAndUpdate(postId, {
             $addToSet: {
                 like: {
-                    _id: userId,
-                },
-            },
+                    _id: userId
+                }
+            }
         })
         debug(addLike)
         next()
@@ -96,9 +100,9 @@ exports.unlikeComment = (req, res, next) => {
         const minLike = PostComment.findByIdAndUpdate(postId, {
             $pull: {
                 like: {
-                    _id: userId,
-                },
-            },
+                    _id: userId
+                }
+            }
         })
         debug(minLike)
         next()

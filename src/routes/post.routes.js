@@ -9,7 +9,7 @@ const {
     updatePostCaption,
     deletePost,
     getUserPostById,
-    togglePostLike,
+    togglePostLike
 } = require('../controllers/post.controllers')
 
 // Middleware

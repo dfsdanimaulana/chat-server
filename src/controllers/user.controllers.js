@@ -16,7 +16,7 @@ exports.getUsers = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(404).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -30,7 +30,7 @@ exports.updateUser = async (req, res) => {
             _id,
             { username, name, email, desc, gender },
             {
-                new: true,
+                new: true
             }
         )
 
@@ -41,7 +41,7 @@ exports.updateUser = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(404).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -62,22 +62,22 @@ exports.updateProfilePic = async (req, res) => {
 
         // upload to cloudinary
         const uploadResponse = await cloudinary.uploader.upload(image, {
-            upload_preset: process.env.CLOUDINARY_UPLOAD_PIC,
+            upload_preset: process.env.CLOUDINARY_UPLOAD_PIC
         })
 
         await User.findByIdAndUpdate(id, {
             img_thumb: uploadResponse.secure_url,
-            img_thumb_id: uploadResponse.public_id,
+            img_thumb_id: uploadResponse.public_id
         })
 
         res.status(200).json({
             message: 'Update success',
-            img_thumb: uploadResponse.secure_url,
+            img_thumb: uploadResponse.secure_url
         })
     } catch (err) {
         debug(err)
         res.status(404).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -89,16 +89,16 @@ exports.removeUser = async (req, res) => {
         const user = await User.findByIdAndDelete(id)
         if (!user) {
             return res.status(404).json({
-                error: 'user not found',
+                error: 'user not found'
             })
         }
         res.json({
-            message: `user with id=${user._id} and username=${user.username} has been deleted`,
+            message: `user with id=${user._id} and username=${user.username} has been deleted`
         })
     } catch (err) {
         debug({ err })
         res.status(404).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -110,7 +110,7 @@ exports.getUserWithPost = async (req, res) => {
     } catch (err) {
         debug({ err })
         res.status(404).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -126,7 +126,7 @@ exports.getUserById = async (req, res) => {
     } catch (err) {
         debug({ err })
         res.status(404).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -139,7 +139,7 @@ exports.follow = async (req, res) => {
         const { followId, userId } = req.body
         if (userId === followId) {
             return res.status(442).json({
-                error: 'Tidak boleh follow diri sendiri!',
+                error: 'Tidak boleh follow diri sendiri!'
             })
         }
 
@@ -148,11 +148,11 @@ exports.follow = async (req, res) => {
         const followUser = await User.findById(followId)
         if (user === null) {
             return res.status(442).json({
-                error: 'Kamu siapa?',
+                error: 'Kamu siapa?'
             })
         } else if (followUser === null) {
             return res.status(442).json({
-                error: 'Kamu mau mengikuti siapa?',
+                error: 'Kamu mau mengikuti siapa?'
             })
         }
 
@@ -160,7 +160,7 @@ exports.follow = async (req, res) => {
         const existFollowers = followUser.followers.includes(userId)
         if (existFollowers) {
             return res.status(442).json({
-                error: 'Sudah mengikuti',
+                error: 'Sudah mengikuti'
             })
         }
 
@@ -170,32 +170,32 @@ exports.follow = async (req, res) => {
             {
                 // pake addToSet biar id yang sama tidak masuk
                 $addToSet: {
-                    followers: userId,
-                },
+                    followers: userId
+                }
             },
             {
-                new: true,
+                new: true
             }
         )
         await User.findByIdAndUpdate(
             userId,
             {
                 $addToSet: {
-                    following: followId,
-                },
+                    following: followId
+                }
             },
             {
-                new: true,
+                new: true
             }
         )
         res.json({
-            message: 'Yeay! berhasil!',
+            message: 'Yeay! berhasil!'
         })
     } catch (error) {
         debug({ error })
 
         res.status(404).json({
-            error: 'Yahh, gagal!',
+            error: 'Yahh, gagal!'
         })
     }
 }
@@ -208,7 +208,7 @@ exports.unFollow = async (req, res) => {
         const { unfollowId, userId } = req.body
         if (unfollowId === userId) {
             return res.status(442).json({
-                error: 'Tidak boleh sama',
+                error: 'Tidak boleh sama'
             })
         }
 
@@ -217,11 +217,11 @@ exports.unFollow = async (req, res) => {
         const famousPerson = await User.findById(unfollowId)
         if (poorPerson === null) {
             return res.status(442).json({
-                error: 'Kamu siapa?',
+                error: 'Kamu siapa?'
             })
         } else if (famousPerson === null) {
             return res.status(422).json({
-                error: 'Siapa yang mau kamu unfollow?',
+                error: 'Siapa yang mau kamu unfollow?'
             })
         }
 
@@ -229,7 +229,7 @@ exports.unFollow = async (req, res) => {
         const existFollower = famousPerson.followers.includes(userId)
         if (!existFollower) {
             return res.status(442).json({
-                error: 'Kamu belum mengikuti',
+                error: 'Kamu belum mengikuti'
             })
         }
 
@@ -238,32 +238,32 @@ exports.unFollow = async (req, res) => {
             unfollowId,
             {
                 $pull: {
-                    followers: userId,
-                },
+                    followers: userId
+                }
             },
             {
-                new: true,
+                new: true
             }
         )
         await User.findByIdAndUpdate(
             userId,
             {
                 $pull: {
-                    following: unfollowId,
-                },
+                    following: unfollowId
+                }
             },
             {
-                new: true,
+                new: true
             }
         )
 
         res.json({
-            message: 'Success unfollow',
+            message: 'Success unfollow'
         })
     } catch (error) {
         debug({ error })
         res.status(404).json({
-            error: 'Fail unfollow',
+            error: 'Fail unfollow'
         })
     }
 }
@@ -278,7 +278,7 @@ exports.followStatus = async (req, res) => {
     } catch (error) {
         debug({ error })
         res.status(404).json({
-            error: error.message,
+            error: error.message
         })
     }
 }

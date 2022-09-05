@@ -2,42 +2,40 @@
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const moment = require('moment')
 const Post = require('./post.models.js')
 
 const postCommentSchema = new Schema(
     {
         sender: {
             type: Schema.Types.ObjectId,
-            ref: 'User',
+            ref: 'User'
         },
         postId: {
             type: Schema.Types.ObjectId,
-            ref: 'Post',
-        },
-        timeSend: {
-            type: String,
-            default: moment().format('hh:mm A'),
+            ref: 'Post'
         },
         msg: {
             type: String,
-            default: 'No Message',
+            default: 'No Message'
         },
         like: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'User',
-            },
+                ref: 'User'
+            }
         ],
         replay: [
             {
-                sender: String,
-                msg: String,
-            },
-        ],
+                sender: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'User'
+                },
+                msg: String
+            }
+        ]
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 )
 
@@ -47,8 +45,8 @@ postCommentSchema.methods.addCommentToPost = function (postId) {
         { _id: postId },
         {
             $push: {
-                comment: this._id,
-            },
+                comment: this._id
+            }
         }
     )
 }

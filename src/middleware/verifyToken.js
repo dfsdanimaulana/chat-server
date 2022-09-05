@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
     jwt.verify(token, process.env.JWT_TOKEN_SECRET, (err, decoded) => {
         if (err)
             return res.status(403).json({
-                error: 'Token is not valid!',
+                error: 'Token is not valid!'
             })
         req.user = decoded // payload contain id and username
         next()

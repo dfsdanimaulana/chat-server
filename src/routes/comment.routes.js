@@ -8,7 +8,7 @@ const {
     likeComment,
     unlikeComment,
     getCommentByPostId,
-    getComments,
+    getComments
 } = require('../controllers/comment.controllers')
 
 // Middleware

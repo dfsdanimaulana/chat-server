@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const moment = require('moment')
 const User = require('./user.models')
 
 const postSchema = new Schema(
@@ -10,52 +9,48 @@ const postSchema = new Schema(
         user: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
+            required: true
         },
         uniqueId: {
             type: String,
-            unique: true,
+            unique: true
         },
         img_post_id: [
             {
-                type: String,
-            },
+                type: String
+            }
         ],
         img_post_url: [
             {
-                type: String,
-            },
+                type: String
+            }
         ],
-        timeSend: {
-            type: String,
-            default: moment().format('hh:mm A'),
-        },
         caption: {
             type: String,
             maxlength: [100, 'caption must be less than 100 characters'],
             default: 'No Caption',
-            required: true,
+            required: true
         },
         hashtag: [
             {
-                type: String,
-            },
+                type: String
+            }
         ],
         comment: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'PostComment',
-            },
+                ref: 'PostComment'
+            }
         ],
         like: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
+                ref: 'User'
+            }
+        ]
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 )
 
@@ -67,8 +62,8 @@ postSchema.methods.addToUserPost = function (userId) {
         { _id: userId },
         {
             $addToSet: {
-                post: this._id,
-            },
+                post: this._id
+            }
         }
     )
 }
@@ -80,9 +75,9 @@ postSchema.methods.addHashtag = function (arr) {
         {
             $addToSet: {
                 hashtag: {
-                    $each: arr,
-                },
-            },
+                    $each: arr
+                }
+            }
         }
     )
 }
@@ -94,9 +89,9 @@ postSchema.methods.addImgPostId = function (arr) {
         {
             $addToSet: {
                 img_post_id: {
-                    $each: arr,
-                },
-            },
+                    $each: arr
+                }
+            }
         }
     )
 }
@@ -108,9 +103,9 @@ postSchema.methods.addImgPostUrl = function (arr) {
         {
             $addToSet: {
                 img_post_url: {
-                    $each: arr,
-                },
-            },
+                    $each: arr
+                }
+            }
         }
     )
 }
@@ -122,9 +117,9 @@ postSchema.methods.likePost = function (arr) {
         {
             $addToSet: {
                 like: {
-                    $each: arr,
-                },
-            },
+                    $each: arr
+                }
+            }
         }
     )
 }
@@ -134,8 +129,8 @@ postSchema.methods.unlikePost = function (userId) {
         { _id: this.id },
         {
             $pull: {
-                like: userId,
-            },
+                like: userId
+            }
         }
     )
 }

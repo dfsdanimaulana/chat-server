@@ -14,11 +14,11 @@ const createToken = (id, username) => {
     return jwt.sign(
         {
             id,
-            username,
+            username
         },
         process.env.JWT_TOKEN_SECRET,
         {
-            expiresIn: '15m',
+            expiresIn: '15m'
         }
     )
 }
@@ -28,7 +28,7 @@ const createRefreshToken = (id, username) => {
     return jwt.sign(
         {
             id,
-            username,
+            username
         },
         process.env.JWT_REFRESH_TOKEN_SECRET
     )
@@ -51,7 +51,7 @@ exports.refreshToken = (req, res) => {
     jwt.verify(rToken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({
-                error: 'Token is not valid!',
+                error: 'Token is not valid!'
             })
         }
 
@@ -64,11 +64,11 @@ exports.refreshToken = (req, res) => {
 
         res.cookie('jwt', newRefreshToken, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
+            httpOnly: true
         })
 
         res.status(200).json({
-            accessToken: newAccessToken,
+            accessToken: newAccessToken
         })
     })
 }
@@ -91,7 +91,7 @@ exports.isLoggedIn = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(422).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -127,7 +127,7 @@ exports.userLogin = async (req, res) => {
 
         res.cookie('jwt', refreshToken, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
+            httpOnly: true
         })
 
         // send except password
@@ -137,7 +137,7 @@ exports.userLogin = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(422).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -153,19 +153,19 @@ exports.userRegister = async (req, res) => {
     // cek if username exists
     if (!username) {
         return res.status(422).json({
-            error: ['username required'],
+            error: ['username required']
         })
     }
     if (password !== confirm_password) {
         return res.status(422).json({
-            error: ['wrong confirm password!'],
+            error: ['wrong confirm password!']
         })
     }
 
     //cek if username valid
     !isLength(username, {
         min: 4,
-        max: 15,
+        max: 15
     })
         ? error.push('username must be more than 4 and less than 15 character')
         : isNumeric(username)
@@ -178,7 +178,7 @@ exports.userRegister = async (req, res) => {
     // cek if email exists
     if (!email) {
         return res.status(422).json({
-            error: ['email required'],
+            error: ['email required']
         })
     }
 
@@ -186,7 +186,7 @@ exports.userRegister = async (req, res) => {
     // cek if password exists
     if (!password) {
         return res.status(422).json({
-            error: ['password required'],
+            error: ['password required']
         })
     }
     // cek password length
@@ -197,7 +197,7 @@ exports.userRegister = async (req, res) => {
     // send error if exist
     if (error.length > 0) {
         return res.status(422).json({
-            error,
+            error
         })
     }
 
@@ -221,7 +221,7 @@ exports.userRegister = async (req, res) => {
             email,
             gender,
             username,
-            password: hashedPassword,
+            password: hashedPassword
         })
 
         // save new user to db
@@ -231,7 +231,7 @@ exports.userRegister = async (req, res) => {
     } catch (err) {
         debug(err)
         res.status(422).json({
-            error: err.message,
+            error: err.message
         })
     }
 }
@@ -249,7 +249,7 @@ exports.changeUserPassword = async (req, res) => {
         const user = await User.findById(_id, 'password')
         if (!user) {
             return res.status(422).json({
-                error: ['User not found!'],
+                error: ['User not found!']
             })
         }
 
@@ -257,7 +257,7 @@ exports.changeUserPassword = async (req, res) => {
         const isValid = await compare(password_old, user.password)
         if (!isValid) {
             return res.status(422).json({
-                error: ['Invalid old password!'],
+                error: ['Invalid old password!']
             })
         }
 
@@ -266,13 +266,13 @@ exports.changeUserPassword = async (req, res) => {
         // cek if password exists
         if (!password_old || !password_new || !password_new_confirm) {
             return res.status(422).json({
-                error: ['password required'],
+                error: ['password required']
             })
         }
 
         if (password_new !== password_new_confirm) {
             return res.status(422).json({
-                error: ['wrong confirm password!'],
+                error: ['wrong confirm password!']
             })
         }
 
@@ -286,7 +286,7 @@ exports.changeUserPassword = async (req, res) => {
         // send error if exist
         if (error.length > 0) {
             return res.status(422).json({
-                error,
+                error
             })
         }
 
@@ -297,14 +297,14 @@ exports.changeUserPassword = async (req, res) => {
         hashedPassword = await hash(password_new, salt)
 
         await User.findByIdAndUpdate(_id, {
-            password: hashedPassword,
+            password: hashedPassword
         })
 
         res.status(200).json({ message: 'Password updated!' })
     } catch (err) {
         debug(err)
         res.status(422).json({
-            error: [err.message],
+            error: [err.message]
         })
     }
 }

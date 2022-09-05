@@ -15,7 +15,7 @@ app.use(
     cors({
         origin: ['http://localhost:3000'],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        credentials: true,
+        credentials: true
     })
 )
 
@@ -34,7 +34,7 @@ app.use('/comment', require('./routes/comment.routes'))
 
 app.use('/', (req, res) => {
     res.json({
-        message: 'Welcome to DanApp server',
+        message: 'Welcome to DanApp server'
     })
 })
 
@@ -52,7 +52,7 @@ app.use(function (err, req, res) {
     // render the error page
     res.status(err.status || 500)
     res.json({
-        message: 'Page Not Found',
+        message: 'Page Not Found'
     })
 })
 

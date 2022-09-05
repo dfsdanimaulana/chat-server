@@ -15,24 +15,24 @@ const userSchema = new Schema(
             lowercase: true,
             validate: [
                 isAlphanumeric,
-                'username must not have any special character',
-            ],
+                'username must not have any special character'
+            ]
         },
         name: {
             type: String,
-            default: '',
+            default: ''
         },
         img_thumb: {
             type: String,
-            default: 'https://i.ibb.co/jkKCvyd/male-avatar.png',
+            default: 'https://i.ibb.co/jkKCvyd/male-avatar.png'
         },
         img_thumb_id: {
             type: String,
-            default: 'new',
+            default: 'new'
         },
         img_bg: {
             type: String,
-            default: 'https://source.unsplash.com/random/400x200',
+            default: 'https://source.unsplash.com/random/400x200'
         },
         email: {
             type: String,
@@ -40,54 +40,54 @@ const userSchema = new Schema(
             lowercase: true,
             unique: [true, 'email address is already use'],
             required: [true, 'email address is required'],
-            validate: [isEmail, 'please fill a valid email address'],
+            validate: [isEmail, 'please fill a valid email address']
         },
         password: {
             type: String,
             required: [true, 'password is required'],
-            minlength: [6, 'password must be 6 character or more'],
+            minlength: [6, 'password must be 6 character or more']
         },
         gender: {
             type: String,
-            default: 'male',
+            default: 'male'
         },
         desc: {
             type: String,
-            default: '',
+            default: ''
         },
         followers: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'User',
-            },
+                ref: 'User'
+            }
         ],
         following: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'User',
-            },
+                ref: 'User'
+            }
         ],
         post: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'Post',
-            },
+                ref: 'Post'
+            }
         ],
         savedPost: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'Post',
-            },
+                ref: 'Post'
+            }
         ],
         age: {
-            type: Number,
+            type: Number
         },
         birthday: {
-            type: Date,
-        },
+            type: Date
+        }
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 )
 

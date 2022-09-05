@@ -14,19 +14,19 @@ exports.getPost = async (req, res) => {
             .sort({ createdAt: -1 })
             .populate({
                 path: 'user',
-                select: 'username img_thumb',
+                select: 'username img_thumb'
             })
             .populate({
                 path: 'comment',
                 select: 'sender timeSend like msg',
                 populate: {
                     path: 'sender',
-                    select: 'username img_thumb',
-                },
+                    select: 'username img_thumb'
+                }
             })
             .populate({
                 path: 'like',
-                select: 'username img_thumb',
+                select: 'username img_thumb'
             })
         res.json(data)
     } catch (error) {
@@ -72,7 +72,7 @@ exports.createNewPost = async (req, res) => {
         const post = new Post({
             user: userId,
             caption,
-            uniqueId,
+            uniqueId
         })
 
         // save post
@@ -81,7 +81,7 @@ exports.createNewPost = async (req, res) => {
         // upload array of image one by one and save url to db
         for (const img of image) {
             const uploadResponse = await cloudinary.uploader.upload(img, {
-                upload_preset: process.env.CLOUDINARY_UPLOAD_POST,
+                upload_preset: process.env.CLOUDINARY_UPLOAD_POST
             })
             await post.addImgPostId([uploadResponse.public_id])
             await post.addImgPostUrl([uploadResponse.secure_url])
@@ -108,11 +108,11 @@ exports.updatePostCaption = (req, res) => {
             id,
             {
                 $set: {
-                    caption,
-                },
+                    caption
+                }
             },
             {
-                new: true,
+                new: true
             }
         )
         res.json(query)
@@ -142,8 +142,8 @@ exports.deletePost = async (req, res) => {
         const userId = deletedPost.user._id
         await User.findByIdAndUpdate(userId, {
             $pull: {
-                post: id,
-            },
+                post: id
+            }
         })
 
         // remove post id in user savedPost field
@@ -151,7 +151,7 @@ exports.deletePost = async (req, res) => {
 
         // remove comments in deleted post
         await PostComment.deleteMany({
-            postId: id,
+            postId: id
         })
 
         res.json({ message: 'post deleted!' })
@@ -169,11 +169,11 @@ exports.getUserPostById = async (req, res) => {
             .sort({ createdAt: -1 })
             .populate({
                 path: 'user',
-                select: 'username img_thumb',
+                select: 'username img_thumb'
             })
             .populate({
                 path: 'like',
-                select: 'username img_thumb',
+                select: 'username img_thumb'
             })
         res.status(200).json(userPosts)
     } catch (err) {
