@@ -91,6 +91,32 @@ const userSchema = new Schema(
     }
 )
 
+// save selected post id to user savedPost array
+userSchema.methods.saveSelectedPost = function (arr) {
+    return User.updateOne(
+        { _id: this.id },
+        {
+            $addToSet: {
+                savedPost: {
+                    $each: arr
+                }
+            }
+        }
+    )
+}
+
+// remove selected post id to user savedPost array
+userSchema.methods.unSaveSelectedPost = function (postId) {
+    return User.updateOne(
+        { _id: this.id },
+        {
+            $pull: {
+                savedPost: postId
+            }
+        }
+    )
+}
+
 const User = mongoose.model('User', userSchema)
 
 module.exports = User

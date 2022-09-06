@@ -123,6 +123,7 @@ postSchema.methods.likePost = function (arr) {
         }
     )
 }
+
 // remove user id to like array
 postSchema.methods.unlikePost = function (userId) {
     return Post.updateOne(

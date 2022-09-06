@@ -3,6 +3,14 @@
 GET {{base}}/post
 
 ###
+// get post by post id
+GET {{base}}/post/6316442a0621b18d0eb8ea8c
+
+###
+// get post by user id
+GET {{base}}/post/user/63137937ba39d74d36e1cc8d
+
+###
 // create new post
 POST {{base}}/post
 Content-Type: application/json
@@ -22,12 +30,23 @@ DELETE {{base}}/post/630cfefea60269f120d38c9a
 Authorization: Bearer {{token}}
 
 ###
-// like or unlike post
-POST {{base}}/post/like
+// toggle like and unlike post
+PUT {{base}}/post/like
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
     "postId":"63137ad474a8d32af3a56771",
+    "userId":"63137937ba39d74d36e1cc8d"
+}
+
+###
+// toggle save and unsave post
+PUT {{base}}/post/save
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "postId":"6314d5837ee5871961ff28a1",
     "userId":"63137937ba39d74d36e1cc8d"
 }

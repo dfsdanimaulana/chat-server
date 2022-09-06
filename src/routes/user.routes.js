@@ -16,7 +16,7 @@ const {
 
 const { verifyToken } = require('../middleware/verifyToken')
 
-/** GET METHOD */
+/* ============================ GET METHODS ============================ */
 
 // get user with post
 router.get('/post', getUserWithPost)
@@ -33,12 +33,14 @@ router.get('/:id', getUserById)
 // get user
 router.get('/', getUsers)
 
-/**  PUT METHOD */
+/* ============================ POST METHODS ============================ */
 
-// follow
+/* ============================ PUT METHODS ============================ */
+
+// follow user
 router.put('/follow', verifyToken, follow)
 
-// unfollow
+// unfollow user
 router.put('/unfollow', verifyToken, unFollow)
 
 // update user
@@ -46,6 +48,7 @@ router.put('/update/image', verifyToken, updateProfilePic)
 
 // update user
 router.put('/update', verifyToken, updateUser)
-/** POST METHOD */
+
+/* ============================ DELETE METHODS ============================ */
 
 module.exports = router

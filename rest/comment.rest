@@ -18,3 +18,8 @@ Authorization: Bearer {{token}}
 // get comment by post id
 GET {{base}}/comment/63130708a89e968bfba989f8
 Authorization: Bearer {{token}}
+
+###
+// delete comment by id 6314d5837ee5871961ff28a1
+DELETE {{base}}/comment/6316422a0621b18d0eb8ea5d
+Authorization: Bearer {{token}}

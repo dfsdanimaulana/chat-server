@@ -120,8 +120,16 @@ exports.getUserById = async (req, res) => {
         const { id } = req.params
         const user = await User.findById(
             id,
-            'username email desc post followers following img_thumb img_bg'
-        )
+            'username name password email gender desc followers following img_thumb img_thumb_id img_bg savedPost'
+        ).populate({
+            path: 'savedPost',
+            populate: 'like comment'
+        })
+
+        // send except password
+        const { password, ...rest } = user._doc
+
+        return res.json({ ...rest })
         res.json(user)
     } catch (err) {
         debug({ err })

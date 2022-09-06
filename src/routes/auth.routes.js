@@ -1,21 +1,27 @@
 'use strict'
 
 const router = require('express').Router()
+const { verifyToken } = require('../middleware/verifyToken')
 const {
     userLogin,
     userLogout,
     userRegister,
-    isLoggedIn,
     refreshToken,
     changeUserPassword
 } = require('../controllers/auth.controllers')
-const { verifyToken } = require('../middleware/verifyToken')
+
+/* ============================ GET METHODS ============================ */
+// refresh user access token when expired
+router.get('/refresh', refreshToken)
+
+/* ============================ POST METHODS ============================ */
 
 router.post('/change_password', verifyToken, changeUserPassword)
 router.post('/login', userLogin)
 router.post('/register', userRegister)
 router.post('/logout', verifyToken, userLogout)
-router.get('/refresh', refreshToken)
-router.get('/', verifyToken, isLoggedIn)
+
+/* ============================ PUT METHODS ============================ */
+/* ============================ DELETE METHODS ============================ */
 
 module.exports = router

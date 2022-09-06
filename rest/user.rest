@@ -4,7 +4,7 @@ GET {{base}}/user
 ###
 
 // get user by id
-GET {{base}}/user/63049de40a8779bd2b154792
+GET {{base}}/user/63137937ba39d74d36e1cc8d
 
 ###
 // update user data by id

@@ -1,9 +1,10 @@
 'use strict'
 
 const debug = require('debug')('dev')
-const { cloudinary } = require('../config/cloudinary')
-const Post = require('../models/post.models')
 const { isAlpha } = require('validator')
+const { cloudinary } = require('../config/cloudinary')
+
+const Post = require('../models/post.models')
 const User = require('../models/user.models')
 const PostComment = require('../models/comment.models')
 
@@ -29,6 +30,35 @@ exports.getPost = async (req, res) => {
                 select: 'username img_thumb'
             })
         res.json(data)
+    } catch (error) {
+        debug({ error })
+        res.status(404).json({ error: error.message })
+    }
+}
+
+// get all post
+exports.getPostById = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const data = await Post.findById(id)
+            .populate({
+                path: 'user',
+                select: 'username img_thumb'
+            })
+            .populate({
+                path: 'comment',
+                select: 'sender timeSend like msg',
+                populate: {
+                    path: 'sender',
+                    select: 'username img_thumb'
+                }
+            })
+            .populate({
+                path: 'like',
+                select: 'username img_thumb'
+            })
+        res.status(200).json(data)
     } catch (error) {
         debug({ error })
         res.status(404).json({ error: error.message })
@@ -122,6 +152,7 @@ exports.updatePostCaption = (req, res) => {
     }
 }
 
+// delete post by id
 exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params
@@ -203,6 +234,35 @@ exports.togglePostLike = async (req, res) => {
             // like post
             await postLike.likePost([userId])
             res.status(200).json({ message: 'like success' })
+        }
+    } catch (err) {
+        debug({ err })
+        res.status(400).json({ error: err.message })
+    }
+}
+
+// toggle save post in user saved post field
+exports.toggleUserSavedPost = async (req, res) => {
+    try {
+        const { userId, postId } = req.body
+
+        if (!userId || !postId) {
+            return res
+                .status(400)
+                .json({ error: 'postId and userId required!' })
+        }
+
+        // check if user already save the selected post or not
+        const user = await User.findById(userId, 'savedPost')
+
+        if (user.savedPost.includes(postId)) {
+            // unsaved selected post
+            await user.unSaveSelectedPost(postId)
+            res.status(200).json({ message: 'post unsaved' })
+        } else {
+            // save selected post
+            await user.saveSelectedPost([postId])
+            res.status(200).json({ message: 'post saved' })
         }
     } catch (err) {
         debug({ err })

@@ -9,28 +9,43 @@ const {
     updatePostCaption,
     deletePost,
     getUserPostById,
-    togglePostLike
+    togglePostLike,
+    toggleUserSavedPost,
+    getPostById
 } = require('../controllers/post.controllers')
 
 // Middleware
 const { verifyToken } = require('../middleware/verifyToken')
 
-// delete post
-router.delete('/:id', verifyToken, deletePost)
+/* ============================ GET METHODS ============================ */
+// get post by id
+router.get('/:id', getPostById)
 
 // get all user posts by userId
-router.get('/:userId', getUserPostById)
+router.get('/user/:userId', getUserPostById)
 
 // get post
 router.get('/', getPost)
 
-// toggle like and unlike post
-router.post('/like', verifyToken, togglePostLike)
+/* ============================ POST METHODS ============================ */
 
 // Add post
 router.post('/', verifyToken, createNewPost)
 
+/* ============================ PUT METHODS ============================ */
+
+// toggle like and unlike post
+router.put('/like', verifyToken, togglePostLike)
+
+// toggle save and unsave selected post
+router.put('/save', verifyToken, toggleUserSavedPost)
+
 // update post
 router.put('/', verifyToken, updatePostCaption)
+
+/* ============================ DELETE METHODS ============================ */
+
+// delete post
+router.delete('/:id', verifyToken, deletePost)
 
 module.exports = router

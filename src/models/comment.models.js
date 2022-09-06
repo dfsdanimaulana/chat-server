@@ -51,6 +51,18 @@ postCommentSchema.methods.addCommentToPost = function (postId) {
     )
 }
 
+// pull comment id in post collection array
+postCommentSchema.methods.removeCommentToPost = function (postId) {
+    return Post.findByIdAndUpdate(
+        { _id: postId },
+        {
+            $pull: {
+                comment: this._id
+            }
+        }
+    )
+}
+
 const PostComment = mongoose.model('PostComment', postCommentSchema)
 
 module.exports = PostComment

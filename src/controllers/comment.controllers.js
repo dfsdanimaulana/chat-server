@@ -106,8 +106,26 @@ exports.unlikeComment = (req, res, next) => {
         })
         debug(minLike)
         next()
-    } catch (error) {
-        debug({ error })
-        res.status(400).json({ error: 'unlike gagal' })
+    } catch (err) {
+        debug({ err })
+        res.status(400).json({ error: err.message })
+    }
+}
+
+// delete comment by id
+exports.deleteCommentById = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        // delete comment
+        const deletedComment = await PostComment.findByIdAndDelete(id)
+
+        // delete comment in post comment array
+        await deletedComment.removeCommentToPost(deletedComment.postId)
+
+        res.status(200).json({ message: 'comment deleted' })
+    } catch (err) {
+        debug({ err })
+        res.status(400).json({ error: err.message })
     }
 }
