@@ -13,7 +13,8 @@ const {
 } = require('../controllers/comment.controller')
 
 // Middleware
-const { verifyToken } = require('../middleware/verifyToken')
+const { authJwt } = require('../middleware')
+const { verifyToken } = authJwt
 
 /* ============================ GET METHODS ============================ */
 
@@ -26,16 +27,16 @@ router.get('/', getComments)
 /* ============================ POST METHODS ============================ */
 
 // add new comment
-router.post('/', verifyToken, addComment)
+router.post('/', [verifyToken], addComment)
 
 /* ============================ PUT METHODS ============================ */
 
 // like comment
-router.put('/like', verifyToken, likeComment)
+router.put('/like', [verifyToken], likeComment)
 // unlike comment
-router.put('/unlike', verifyToken, unlikeComment)
+router.put('/unlike', [verifyToken], unlikeComment)
 
 /* ============================ DELETE METHODS ============================ */
-router.delete('/:id', verifyToken, deleteCommentById)
+router.delete('/:id', [verifyToken], deleteCommentById)
 
 module.exports = router

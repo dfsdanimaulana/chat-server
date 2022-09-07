@@ -14,7 +14,9 @@ const {
     updateProfilePic
 } = require('../controllers/user.controller')
 
-const { verifyToken } = require('../middleware/verifyToken')
+// middleware
+const { authJwt } = require('../middleware')
+const { verifyToken } = authJwt
 
 /* ============================ GET METHODS ============================ */
 
@@ -25,7 +27,7 @@ router.get('/post', getUserWithPost)
 router.get('/follow-status', followStatus)
 
 // delete user
-router.get('/del/:id', verifyToken, removeUser)
+router.get('/del/:id', [verifyToken], removeUser)
 
 // get user by id
 router.get('/:id', getUserById)
@@ -38,16 +40,16 @@ router.get('/', getUsers)
 /* ============================ PUT METHODS ============================ */
 
 // follow user
-router.put('/follow', verifyToken, follow)
+router.put('/follow', [verifyToken], follow)
 
 // unfollow user
-router.put('/unfollow', verifyToken, unFollow)
+router.put('/unfollow', [verifyToken], unFollow)
+
+// update user image profile
+router.put('/update/image', [verifyToken], updateProfilePic)
 
 // update user
-router.put('/update/image', verifyToken, updateProfilePic)
-
-// update user
-router.put('/update', verifyToken, updateUser)
+router.put('/update', [verifyToken], updateUser)
 
 /* ============================ DELETE METHODS ============================ */
 

@@ -18,6 +18,25 @@ const userSchema = new Schema(
                 'username must not have any special character'
             ]
         },
+        email: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            unique: [true, 'email address is already use'],
+            required: [true, 'email address is required'],
+            validate: [isEmail, 'please fill a valid email address']
+        },
+        password: {
+            type: String,
+            required: [true, 'password is required'],
+            minlength: [6, 'password must be 6 character or more']
+        },
+        roles: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Role'
+            }
+        ],
         name: {
             type: String,
             default: ''
@@ -34,19 +53,7 @@ const userSchema = new Schema(
             type: String,
             default: 'https://source.unsplash.com/random/400x200'
         },
-        email: {
-            type: String,
-            trim: true,
-            lowercase: true,
-            unique: [true, 'email address is already use'],
-            required: [true, 'email address is required'],
-            validate: [isEmail, 'please fill a valid email address']
-        },
-        password: {
-            type: String,
-            required: [true, 'password is required'],
-            minlength: [6, 'password must be 6 character or more']
-        },
+
         gender: {
             type: String,
             default: 'male'
@@ -90,32 +97,6 @@ const userSchema = new Schema(
         timestamps: true
     }
 )
-
-// save selected post id to user savedPost array
-userSchema.methods.saveSelectedPost = function (arr) {
-    return User.updateOne(
-        { _id: this.id },
-        {
-            $addToSet: {
-                savedPost: {
-                    $each: arr
-                }
-            }
-        }
-    )
-}
-
-// remove selected post id to user savedPost array
-userSchema.methods.unSaveSelectedPost = function (postId) {
-    return User.updateOne(
-        { _id: this.id },
-        {
-            $pull: {
-                savedPost: postId
-            }
-        }
-    )
-}
 
 const User = mongoose.model('User', userSchema)
 

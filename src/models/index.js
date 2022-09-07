@@ -4,6 +4,9 @@ mongoose.Promise = global.Promise
 const db = {}
 
 db.mongoose = mongoose
+
+db.mongoose.set('returnOriginal', false)
+
 db.user = require('./user.model')
 db.role = require('./role.model')
 db.post = require('./post.model')

@@ -1,7 +1,8 @@
 'use strict'
 
 // user models
-const User = require('../models/user.model')
+const db = require('../models')
+const User = db.user
 const debug = require('debug')('dev')
 const { cloudinary } = require('../config/cloudinary')
 
@@ -118,10 +119,7 @@ exports.getUserWithPost = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const { id } = req.params
-        const user = await User.findById(
-            id,
-            'username name password email gender desc followers following img_thumb img_thumb_id img_bg savedPost'
-        ).populate({
+        const user = await User.findById(id).populate({
             path: 'savedPost',
             populate: 'like comment'
         })
@@ -130,7 +128,6 @@ exports.getUserById = async (req, res) => {
         const { password, ...rest } = user._doc
 
         return res.json({ ...rest })
-        res.json(user)
     } catch (err) {
         debug({ err })
         res.status(404).json({

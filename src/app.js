@@ -4,7 +4,8 @@ const express = require('express')
 const createError = require('http-errors')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const mongoose = require('./config/mongodb')
+const db = require('./models')
+const Role = db.role
 const chalk = require('chalk')
 require('dotenv').config()
 
@@ -57,18 +58,51 @@ app.use(function (err, req, res) {
 })
 
 // connect to db
-
-mongoose.connection
-    .on(
-        'error',
-        console.error.bind(console, new Error('Database Connection Error!'))
-    )
-    .once('open', () => {
-        console.log(
-            chalk.red.italic(`    
-          💾 Database connected!
-        `)
-        )
+db.mongoose
+    .connect(process.env.DB_ATLAS, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
     })
+    .then(() => {
+        console.log(chalk.blue('Database Connected'))
+        initial()
+    })
+    .catch((err) => {
+        console.error('DB Connection Error', err)
+        process.exit()
+    })
+
+// initial() function helps us to create 3 important rows in roles collection.
+
+function initial() {
+    Role.estimatedDocumentCount((err, count) => {
+        if (!err && count === 0) {
+            new Role({
+                name: 'user'
+            }).save((err) => {
+                if (err) {
+                    console.log('Role error', err)
+                }
+                console.log("added 'user' to roles collection")
+            })
+            new Role({
+                name: 'moderator'
+            }).save((err) => {
+                if (err) {
+                    console.log('Role error', err)
+                }
+                console.log("added 'moderator' to roles collection")
+            })
+            new Role({
+                name: 'admin'
+            }).save((err) => {
+                if (err) {
+                    console.log('Role error', err)
+                }
+                console.log("added 'admin' to roles collection")
+            })
+        }
+    })
+}
 
 module.exports = app

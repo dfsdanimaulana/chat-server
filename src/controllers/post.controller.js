@@ -123,7 +123,6 @@ exports.createNewPost = async (req, res) => {
         }
 
         // save post id to user post array
-        // await post.addToUserPost(userId)
         await User.findByIdAndUpdate(userId, {
             $addToSet: {
                 post: savedPost._id
@@ -162,7 +161,7 @@ exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params
 
-        const deletedPost = await Post.findByIdAndDelete(id)
+        const deletedPost = await Post.findByIdAndDelete(id).populate('user')
         if (!deletedPost) {
             res.status(404).json({ error: 'Post not found!' })
         }
@@ -174,16 +173,14 @@ exports.deletePost = async (req, res) => {
             await cloudinary.uploader.destroy(pbId)
         }
 
-        // remove post id in user post filed
+        // remove post id in user post filed and user savedPost field
         const userId = deletedPost.user._id
-        const user = await User.findByIdAndUpdate(userId, {
+        await User.findByIdAndUpdate(userId, {
             $pull: {
-                post: id
+                post: id,
+                savedPost: id
             }
         })
-
-        // remove post id in user savedPost field
-        await user.unSaveSelectedPost(id)
 
         // remove comments in deleted post
         await PostComment.deleteMany({
@@ -262,11 +259,29 @@ exports.toggleUserSavedPost = async (req, res) => {
 
         if (user.savedPost.includes(postId)) {
             // unsaved selected post
-            await user.unSaveSelectedPost(postId)
+            await User.updateOne(
+                { _id: userId },
+                {
+                    $pull: {
+                        savedPost: postId
+                    }
+                }
+            )
+
             res.status(200).json({ message: 'post unsaved' })
         } else {
             // save selected post
-            await user.saveSelectedPost([postId])
+            await User.updateOne(
+                { _id: userId },
+                {
+                    $addToSet: {
+                        savedPost: {
+                            $each: [postId]
+                        }
+                    }
+                }
+            )
+
             res.status(200).json({ message: 'post saved' })
         }
     } catch (err) {

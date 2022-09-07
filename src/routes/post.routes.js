@@ -15,7 +15,8 @@ const {
 } = require('../controllers/post.controller')
 
 // Middleware
-const { verifyToken } = require('../middleware/verifyToken')
+const { authJwt } = require('../middleware')
+const { verifyToken } = authJwt
 
 /* ============================ GET METHODS ============================ */
 // get post by id
@@ -30,22 +31,22 @@ router.get('/', getPost)
 /* ============================ POST METHODS ============================ */
 
 // Add post
-router.post('/', verifyToken, createNewPost)
+router.post('/', [verifyToken], createNewPost)
 
 /* ============================ PUT METHODS ============================ */
 
 // toggle like and unlike post
-router.put('/like', verifyToken, togglePostLike)
+router.put('/like', [verifyToken], togglePostLike)
 
 // toggle save and unsave selected post
-router.put('/save', verifyToken, toggleUserSavedPost)
+router.put('/save', [verifyToken], toggleUserSavedPost)
 
 // update post
-router.put('/', verifyToken, updatePostCaption)
+router.put('/', [verifyToken], updatePostCaption)
 
 /* ============================ DELETE METHODS ============================ */
 
 // delete post
-router.delete('/:id', verifyToken, deletePost)
+router.delete('/:id', [verifyToken], deletePost)
 
 module.exports = router

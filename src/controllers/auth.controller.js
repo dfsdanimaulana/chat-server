@@ -1,12 +1,13 @@
 'use strict'
 
 const { compare } = require('bcryptjs')
-const { isAlphanumeric, isLength, isNumeric, isEmail } = require('validator')
+const { isEmail } = require('validator')
 const { genSalt, hash } = require('bcryptjs')
 const debug = require('debug')('dev')
 const jwt = require('jsonwebtoken')
 const db = require('../models')
 const User = db.user
+const Role = db.role
 
 let refreshTokens = [] // array of String token
 
@@ -19,7 +20,7 @@ const createToken = (id, username) => {
         },
         process.env.JWT_TOKEN_SECRET,
         {
-            expiresIn: '15m'
+            expiresIn: '5m'
         }
     )
 }
@@ -82,11 +83,12 @@ exports.userLogin = async (req, res) => {
     try {
         // get user password by username
         const user = await User.findOne(
-            isEmail(username) ? { email: username } : { username },
-            'username name password email gender desc followers following img_thumb img_thumb_id img_bg savedPost'
-        ).populate({
-            path: 'savedPost'
-        })
+            isEmail(username) ? { email: username } : { username }
+        )
+            .populate('roles', '-__v')
+            .populate({
+                path: 'savedPost'
+            })
 
         if (!user) {
             if (isEmail(username)) {
@@ -111,10 +113,20 @@ exports.userLogin = async (req, res) => {
             httpOnly: true
         })
 
+        const authorities = []
+        for (let i = 0; i < user.roles.length; i++) {
+            authorities.push('ROLE_' + user.roles[i].name.toUpperCase())
+        }
+
         // send except password
         const { password, ...rest } = user._doc
 
-        return res.json({ ...rest, accessToken, refreshToken })
+        return res.json({
+            ...rest,
+            accessToken,
+            refreshToken,
+            roles: authorities
+        })
     } catch (err) {
         debug(err)
         res.status(422).json({
@@ -123,64 +135,9 @@ exports.userLogin = async (req, res) => {
     }
 }
 
-// register handler
+// register new user
 exports.userRegister = async (req, res) => {
-    const { username, email, password, gender, confirm_password } = req.body
-
-    const error = []
-
-    /** validate username */
-
-    // cek if username exists
-    if (!username) {
-        return res.status(422).json({
-            error: ['username required']
-        })
-    }
-    if (password !== confirm_password) {
-        return res.status(422).json({
-            error: ['wrong confirm password!']
-        })
-    }
-
-    //cek if username valid
-    !isLength(username, {
-        min: 4,
-        max: 15
-    })
-        ? error.push('username must be more than 4 and less than 15 character')
-        : isNumeric(username)
-        ? error.push('username must contain alphabet')
-        : !isAlphanumeric(username) &&
-          error.push('username must not contain any special characters')
-
-    /** validate email */
-
-    // cek if email exists
-    if (!email) {
-        return res.status(422).json({
-            error: ['email required']
-        })
-    }
-
-    /**  validate password */
-    // cek if password exists
-    if (!password) {
-        return res.status(422).json({
-            error: ['password required']
-        })
-    }
-    // cek password length
-    if (password.length < 6) {
-        error.push('password must be more than 6 characters')
-    }
-
-    // send error if exist
-    if (error.length > 0) {
-        return res.status(422).json({
-            error
-        })
-    }
+    const { username, email, password, gender, roles } = req.body
 
     try {
         // hash password
@@ -205,10 +162,27 @@ exports.userRegister = async (req, res) => {
             password: hashedPassword
         })
 
-        // save new user to db
-        const savedUser = await user.save()
+        // check if rules given
+        if (roles) {
+            const userRoles = await Role.find({
+                name: {
+                    $in: roles
+                }
+            })
 
-        res.json(savedUser) // redirect to /login
+            user.roles = userRoles.map((role) => role._id)
+        } else {
+            const userRoles = await Role.findOne({
+                name: 'user'
+            })
+
+            user.roles = [userRoles._id]
+        }
+
+        // save new user to db
+        await user.save()
+
+        res.status(200).json({ message: 'new user created' }) // redirect to /login
     } catch (err) {
         debug(err)
         res.status(422).json({

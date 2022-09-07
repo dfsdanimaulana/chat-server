@@ -1,9 +1,10 @@
 'use strict'
 
-const User = require('../models/user.model')
+const db = require('../models')
+const User = db.user
 const { compare } = require('bcryptjs')
 
-const matchPassword = async (req, res, next) => {
+exports.matchPassword = async (req, res, next) => {
     const { userId, password } = req.body
 
     try {
@@ -18,5 +19,3 @@ const matchPassword = async (req, res, next) => {
         res.status(400).json({ error: 'match password error', error })
     }
 }
-
-module.exports = { matchPassword }
