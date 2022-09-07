@@ -1,6 +1,6 @@
 'use strict'
 
-const User = require('../models/user.models')
+const User = require('../models/user.model')
 const { compare } = require('bcryptjs')
 
 const matchPassword = async (req, res, next) => {

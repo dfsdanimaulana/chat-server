@@ -1,7 +1,10 @@
 'use strict'
 
-const PostComment = require('../models/comment.models')
 const debug = require('debug')('dev')
+
+const db = require('../models')
+const PostComment = db.comment
+const Post = db.post
 
 // get all comment
 exports.getComments = async (req, res) => {
@@ -42,9 +45,14 @@ exports.addComment = async (req, res) => {
         })
 
         // save comment
-        await comment.save()
+        const savedComment = await comment.save()
         // add saved comment id to post comment array
-        await comment.addCommentToPost(postId)
+        // await comment.addCommentToPost(postId)
+        await Post.findByIdAndUpdate(postId, {
+            $push: {
+                comment: savedComment._id
+            }
+        })
 
         res.json({ message: 'comment added' })
     } catch (err) {
@@ -120,8 +128,13 @@ exports.deleteCommentById = async (req, res) => {
         // delete comment
         const deletedComment = await PostComment.findByIdAndDelete(id)
 
+        // await deletedComment.removeCommentToPost(deletedComment.postId)
         // delete comment in post comment array
-        await deletedComment.removeCommentToPost(deletedComment.postId)
+        await Post.findByIdAndUpdate(deletedComment.postId, {
+            $pull: {
+                comment: id
+            }
+        })
 
         res.status(200).json({ message: 'comment deleted' })
     } catch (err) {

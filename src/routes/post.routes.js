@@ -12,7 +12,7 @@ const {
     togglePostLike,
     toggleUserSavedPost,
     getPostById
-} = require('../controllers/post.controllers')
+} = require('../controllers/post.controller')
 
 // Middleware
 const { verifyToken } = require('../middleware/verifyToken')

@@ -8,7 +8,7 @@ const {
     userRegister,
     refreshToken,
     changeUserPassword
-} = require('../controllers/auth.controllers')
+} = require('../controllers/auth.controller')
 
 /* ============================ GET METHODS ============================ */
 // refresh user access token when expired

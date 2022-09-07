@@ -1,7 +1,7 @@
 'use strict'
 
 // user models
-const User = require('../models/user.models')
+const User = require('../models/user.model')
 const debug = require('debug')('dev')
 const { cloudinary } = require('../config/cloudinary')
 

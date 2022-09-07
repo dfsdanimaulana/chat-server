@@ -12,7 +12,7 @@ const {
     followStatus,
     updateUser,
     updateProfilePic
-} = require('../controllers/user.controllers')
+} = require('../controllers/user.controller')
 
 const { verifyToken } = require('../middleware/verifyToken')
 

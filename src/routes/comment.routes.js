@@ -10,7 +10,7 @@ const {
     getCommentByPostId,
     getComments,
     deleteCommentById
-} = require('../controllers/comment.controllers')
+} = require('../controllers/comment.controller')
 
 // Middleware
 const { verifyToken } = require('../middleware/verifyToken')

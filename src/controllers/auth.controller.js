@@ -5,7 +5,8 @@ const { isAlphanumeric, isLength, isNumeric, isEmail } = require('validator')
 const { genSalt, hash } = require('bcryptjs')
 const debug = require('debug')('dev')
 const jwt = require('jsonwebtoken')
-const User = require('../models/user.models')
+const db = require('../models')
+const User = db.user
 
 let refreshTokens = [] // array of String token
 

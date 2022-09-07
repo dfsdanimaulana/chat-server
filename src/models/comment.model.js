@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const Post = require('./post.models.js')
+const Post = require('./post.model')
 
 const postCommentSchema = new Schema(
     {

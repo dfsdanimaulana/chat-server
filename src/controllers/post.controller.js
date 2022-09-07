@@ -3,10 +3,10 @@
 const debug = require('debug')('dev')
 const { isAlpha } = require('validator')
 const { cloudinary } = require('../config/cloudinary')
-
-const Post = require('../models/post.models')
-const User = require('../models/user.models')
-const PostComment = require('../models/comment.models')
+const db = require('../models')
+const Post = db.post
+const User = db.user
+const PostComment = db.comment
 
 // get all post
 exports.getPost = async (req, res) => {
@@ -123,7 +123,12 @@ exports.createNewPost = async (req, res) => {
         }
 
         // save post id to user post array
-        await post.addToUserPost(userId)
+        // await post.addToUserPost(userId)
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: {
+                post: savedPost._id
+            }
+        })
 
         res.status(200).json({ message: 'posted!', data: savedPost })
     } catch (err) {
@@ -171,14 +176,14 @@ exports.deletePost = async (req, res) => {
 
         // remove post id in user post filed
         const userId = deletedPost.user._id
-        await User.findByIdAndUpdate(userId, {
+        const user = await User.findByIdAndUpdate(userId, {
             $pull: {
                 post: id
             }
         })
 
         // remove post id in user savedPost field
-        // code here ....
+        await user.unSaveSelectedPost(id)
 
         // remove comments in deleted post
         await PostComment.deleteMany({
