@@ -59,7 +59,7 @@ app.use(function (err, req, res) {
 
 // connect to db
 db.mongoose
-    .connect(process.env.DB_ATLAS, {
+    .connect(process.env.DB_ATLAS_DEV, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
