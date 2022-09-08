@@ -12,10 +12,10 @@ const {
     followStatus,
     updateUser,
     updateProfilePic
-} = require('../controllers/user.controller')
+} = require('../../controllers/user.controller')
 
 // middleware
-const { authJwt } = require('../middleware')
+const { authJwt } = require('../../middlewares')
 const { verifyToken } = authJwt
 
 /* ============================ GET METHODS ============================ */

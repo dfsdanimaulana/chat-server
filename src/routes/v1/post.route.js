@@ -12,10 +12,10 @@ const {
     togglePostLike,
     toggleUserSavedPost,
     getPostById
-} = require('../controllers/post.controller')
+} = require('../../controllers/post.controller')
 
 // Middleware
-const { authJwt } = require('../middleware')
+const { authJwt } = require('../../middlewares')
 const { verifyToken } = authJwt
 
 /* ============================ GET METHODS ============================ */

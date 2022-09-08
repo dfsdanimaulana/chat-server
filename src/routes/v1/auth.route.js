@@ -7,9 +7,9 @@ const {
     userRegister,
     refreshToken,
     changeUserPassword
-} = require('../controllers/auth.controller')
+} = require('../../controllers/auth.controller')
 
-const { authJwt, verifySignUp } = require('../middleware')
+const { authJwt, verifySignUp } = require('../../middlewares')
 const { validateData, checkDuplicateUsernameOrEmail } = verifySignUp
 const { verifyToken } = authJwt
 

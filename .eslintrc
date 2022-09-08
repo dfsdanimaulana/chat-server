@@ -14,5 +14,6 @@
         "no-unused-vars": "warn",
         "strict": "error",
         "semi": "off"
-    }
+    },
+    "root": true
 }

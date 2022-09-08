@@ -10,10 +10,10 @@ const {
     getCommentByPostId,
     getComments,
     deleteCommentById
-} = require('../controllers/comment.controller')
+} = require('../../controllers/comment.controller')
 
 // Middleware
-const { authJwt } = require('../middleware')
+const { authJwt } = require('../../middlewares')
 const { verifyToken } = authJwt
 
 /* ============================ GET METHODS ============================ */

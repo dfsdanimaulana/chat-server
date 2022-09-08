@@ -1,5 +1,5 @@
 // get all user
-GET {{base}}/user
+GET {{base}}/v1/user
 
 ###
 

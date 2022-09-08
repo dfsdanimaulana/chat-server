@@ -1,12 +1,9 @@
 'use strict'
 
 const mongoose = require('mongoose')
-require('dotenv').config()
+const config = require('./config')
 
-mongoose.connect(process.env.DB_ATLAS, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(config.mongoose.url, config.mongoose.options)
 
 mongoose.set('returnOriginal', false)
 

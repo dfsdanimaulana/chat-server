@@ -15,7 +15,7 @@ exports.matchPassword = async (req, res, next) => {
         } else {
             res.status(442).json({ error: 'incorrect password' })
         }
-    } catch (error) {
-        res.status(400).json({ error: 'match password error', error })
+    } catch (err) {
+        res.status(400).json({ error: 'match password error', err })
     }
 }
