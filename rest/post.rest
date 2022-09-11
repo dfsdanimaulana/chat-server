@@ -26,7 +26,7 @@ Authorization: Bearer {{token}}
 ###
 
 // delete post by id
-DELETE {{base}}/post/630cfefea60269f120d38c9a
+DELETE {{base}}/post/631890ffd5e84f6d304a0d09
 Authorization: Bearer {{token}}
 
 ###

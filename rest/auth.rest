@@ -8,7 +8,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "username":"alexa",
+    "username":"guest",
     "password":"test123"
 }
 
@@ -19,9 +19,9 @@ POST {{base}}/auth/register
 Content-Type: application/json
 
 {
-    "username":"james",
+    "username":"guest",
     "gender": "male",
-    "email":"james@gmail.com",
+    "email":"guest@gmail.com",
     "password":"test123",
     "confirm_password":"test123"
 }

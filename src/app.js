@@ -1,13 +1,10 @@
-'use strict'
 
 const express = require('express')
 const createError = require('http-errors')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const db = require('./models')
-const Role = db.role
-const chalk = require('chalk')
 require('dotenv').config()
+const routes = require('./routes')
 
 const app = express()
 
@@ -28,16 +25,7 @@ app.use(
 app.use(cookieParser())
 
 // Routes
-app.use('/auth', require('./routes/auth.routes'))
-app.use('/user', require('./routes/user.routes'))
-app.use('/post', require('./routes/post.routes'))
-app.use('/comment', require('./routes/comment.routes'))
-
-app.use('/', (req, res) => {
-    res.json({
-        message: 'Welcome to DanApp server'
-    })
-})
+app.use('/v1', routes)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -56,53 +44,5 @@ app.use(function (err, req, res) {
         message: 'Page Not Found'
     })
 })
-
-// connect to db
-db.mongoose
-    .connect(process.env.DB_ATLAS_DEV, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
-    .then(() => {
-        console.log(chalk.blue('Database Connected'))
-        initial()
-    })
-    .catch((err) => {
-        console.error('DB Connection Error', err)
-        process.exit()
-    })
-
-// initial() function helps us to create 3 important rows in roles collection.
-
-function initial() {
-    Role.estimatedDocumentCount((err, count) => {
-        if (!err && count === 0) {
-            new Role({
-                name: 'user'
-            }).save((err) => {
-                if (err) {
-                    console.log('Role error', err)
-                }
-                console.log("added 'user' to roles collection")
-            })
-            new Role({
-                name: 'moderator'
-            }).save((err) => {
-                if (err) {
-                    console.log('Role error', err)
-                }
-                console.log("added 'moderator' to roles collection")
-            })
-            new Role({
-                name: 'admin'
-            }).save((err) => {
-                if (err) {
-                    console.log('Role error', err)
-                }
-                console.log("added 'admin' to roles collection")
-            })
-        }
-    })
-}
 
 module.exports = app

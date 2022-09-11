@@ -3,11 +3,11 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "start": "node ./bin/server.js",
-        "dev": "set DEBUG=dev & nodemon ./bin/server.js",
+        "start": "node src/index.js",
+        "dev": "set DEBUG=dev & nodemon src/index.js",
         "predev2": "set DEBUG=dev",
-        "dev2": "DEBUG=dev nodemon ./bin/server.js",
-        "commit": "node ./src/utils/commit.js",
+        "dev2": "DEBUG=dev nodemon src/index.js",
+        "commit": "node commit.js",
         "prettier": "npx prettier --write \"src/**/*.js\"",
         "prettier_check": "npx prettier --check \"src/**/*.js\""
     },

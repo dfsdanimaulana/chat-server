@@ -1,11 +1,5 @@
 'use strict'
 
-const authJwt = require('./authJwt')
-const matchPassword = require('./matchPassword')
-const verifySignUp = require('./verifySignUp')
-
-module.exports = {
-    authJwt,
-    matchPassword,
-    verifySignUp
-}
+module.exports.authJwt = require('./authJwt')
+module.exports.matchPassword = require('./matchPassword')
+module.exports.verifySignUp = require('./verifySignUp')
