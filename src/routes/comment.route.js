@@ -1,14 +1,13 @@
-
 const router = require('express').Router()
 
 // Controllers
 const {
-    addComment,
-    likeComment,
-    unlikeComment,
-    getCommentByPostId,
-    getComments,
-    deleteCommentById
+  addComment,
+  likeComment,
+  unlikeComment,
+  getCommentByPostId,
+  getComments,
+  deleteCommentById
 } = require('../controllers/comment.controller')
 
 // Middleware

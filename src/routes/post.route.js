@@ -1,16 +1,15 @@
-
 const router = require('express').Router()
 
 // post controller
 const {
-    getPost,
-    createNewPost,
-    updatePostCaption,
-    deletePost,
-    getUserPostById,
-    togglePostLike,
-    toggleUserSavedPost,
-    getPostById
+  getPost,
+  createNewPost,
+  updatePostCaption,
+  deletePost,
+  getUserPostById,
+  togglePostLike,
+  toggleUserSavedPost,
+  getPostById
 } = require('../controllers/post.controller')
 
 // Middleware

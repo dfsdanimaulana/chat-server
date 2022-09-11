@@ -3,15 +3,15 @@
 const router = require('express').Router()
 
 const {
-    getUsers,
-    removeUser,
-    getUserWithPost,
-    getUserById,
-    follow,
-    unFollow,
-    followStatus,
-    updateUser,
-    updateProfilePic
+  getUsers,
+  removeUser,
+  getUserWithPost,
+  getUserById,
+  follow,
+  unFollow,
+  followStatus,
+  updateUser,
+  updateProfilePic
 } = require('../controllers/user.controller')
 
 // middleware
