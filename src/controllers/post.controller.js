@@ -155,11 +155,11 @@ exports.updatePostCaption = (req, res) => {
 // delete post by id
 exports.deletePost = async (req, res) => {
   try {
-    const { id } = req.params
+    const { postId } = req.params
 
-    const deletedPost = await Post.findByIdAndDelete(id).populate('user')
+    const deletedPost = await Post.findByIdAndDelete(postId).populate('user')
     if (!deletedPost) {
-      res.status(404).json({ error: 'Post not found!' })
+      return res.status(404).json({ error: 'Post not found!' })
     }
 
     const publicId = deletedPost.img_post_id
@@ -173,14 +173,14 @@ exports.deletePost = async (req, res) => {
     const userId = deletedPost.user._id
     await User.findByIdAndUpdate(userId, {
       $pull: {
-        post: id,
-        savedPost: id
+        post: postId,
+        savedPost: postId
       }
     })
 
     // remove comments in deleted post
     await PostComment.deleteMany({
-      postId: id
+      postId
     })
 
     res.json({ message: 'post deleted!' })
