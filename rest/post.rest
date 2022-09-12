@@ -3,8 +3,16 @@
 GET {{base}}/post
 
 ###
+// get all post with query
+GET {{base}}/post?userId=631ebe3fc45cdc4a8446f411&populate=user,comment
+
+###
+// get all post with query
+GET {{base}}/post?sortBy=createdAt:asc&populate=comment,user
+
+###
 // get post by post id
-GET {{base}}/post/6316442a0621b18d0eb8ea8c
+GET {{base}}/post/631f0176f405bee5526d4357?populate=comment,like
 
 ###
 // get post by user id

@@ -6,56 +6,56 @@ const User = db.user
 
 // get all user in database
 exports.getUsers = async (req, res) => {
-  const filters = {}
-  const options = {}
-  const populates = []
-
-  const { sortBy, username, populate } = req.query
-
-  if (sortBy) {
-    // sortBy=createdAt:desc,username:desc
-    const opt = {}
-    sortBy
-      .split(',')
-      .map((val) => val.split(':'))
-      .map((val) => (opt[val[0]] = val[1]))
-
-    if (opt.createdAt) {
-      if (opt.createdAt === 'desc') {
-        options.createdAt = -1
-      } else {
-        options.createdAt = 1
-      }
-    }
-
-    if (opt.username) {
-      if (opt.username === 'desc') {
-        options.username = -1
-      } else {
-        options.username = 1
-      }
-    }
-  } else {
-    options.createdAt = 1
-  }
-
-  if (username) {
-    filters.username = username
-  }
-
-  if (populate) {
-    const populateOptions = ['post', 'savedPost', 'roles']
-    // populate=roles
-    const opt = populate.split(',')
-
-    populateOptions.forEach((val) => {
-      if (opt.includes(val)) {
-        populates.push(val)
-      }
-    })
-  }
-
   try {
+    const filters = {}
+    const options = {}
+    const populates = []
+
+    const { sortBy, username, populate } = req.query
+
+    if (sortBy) {
+      // sortBy=createdAt:desc,username:desc
+      const opt = {}
+      sortBy
+        .split(',')
+        .map((val) => val.split(':'))
+        .map((val) => (opt[val[0]] = val[1]))
+
+      if (opt.createdAt) {
+        if (opt.createdAt === 'desc') {
+          options.createdAt = -1
+        } else {
+          options.createdAt = 1
+        }
+      }
+
+      if (opt.username) {
+        if (opt.username === 'desc') {
+          options.username = -1
+        } else {
+          options.username = 1
+        }
+      }
+    } else {
+      options.createdAt = 1
+    }
+
+    if (username) {
+      filters.username = username
+    }
+
+    if (populate) {
+      const populateOptions = ['post', 'savedPost', 'roles']
+      // populate=roles
+      const opt = populate.split(',')
+
+      populateOptions.forEach((val) => {
+        if (opt.includes(val)) {
+          populates.push(val)
+        }
+      })
+    }
+    
     const users = await User.find(filters).populate(populates).sort(options)
     if (!users) {
       return res.status(httpStatus.NOT_FOUND).json({ error: 'users not found' })

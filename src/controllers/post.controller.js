@@ -1,5 +1,3 @@
-'use strict'
-
 const debug = require('debug')('dev')
 const { isAlpha } = require('validator')
 const { cloudinary } = require('../config/cloudinary')
@@ -9,27 +7,71 @@ const User = db.user
 const PostComment = db.comment
 
 // get all post
-exports.getPost = async (req, res) => {
+exports.getPosts = async (req, res) => {
   try {
-    const data = await Post.find({})
-      .sort({ createdAt: -1 })
-      .populate({
-        path: 'user',
-        select: 'username img_thumb'
-      })
-      .populate({
-        path: 'comment',
-        select: 'sender timeSend like msg',
-        populate: {
-          path: 'sender',
-          select: 'username img_thumb'
+    const filters = {}
+    const options = {}
+    const populates = []
+
+    const { sortBy, populate, userId } = req.query
+
+    if (sortBy) {
+      // sortBy=createdAt:desc
+      const opt = {}
+      sortBy
+        .split(',')
+        .map((val) => val.split(':'))
+        .map((val) => (opt[val[0]] = val[1]))
+
+      if (opt.createdAt) {
+        if (opt.createdAt === 'desc') {
+          options.createdAt = -1
+        } else {
+          options.createdAt = 1
+        }
+      }
+    } else {
+      options.createdAt = 1
+    }
+
+    if (userId) {
+      filters.user = userId
+    }
+
+    if (populate) {
+      const populateOptions = ['user', 'comment', 'like']
+      // populate=user,comment:sender,like
+      const opt = populate.split(',')
+
+      populateOptions.forEach((val) => {
+        if (opt.includes(val)) {
+          populates.push(val)
         }
       })
-      .populate({
-        path: 'like',
-        select: 'username img_thumb'
-      })
-    res.json(data)
+    }
+
+    const posts = await Post.find(filters).populate(populates).sort(options)
+    if (!posts) {
+      return res.status(404).json({ error: 'posts no found' })
+    }
+    // .sort({ createdAt: -1 })
+    // .populate({
+    //   path: 'user',
+    //   select: 'username img_thumb'
+    // })
+    // .populate({
+    //   path: 'comment',
+    //   select: 'sender timeSend like msg',
+    //   populate: {
+    //     path: 'sender',
+    //     select: 'username img_thumb'
+    //   }
+    // })
+    // .populate({
+    //   path: 'like',
+    //   select: 'username img_thumb'
+    // })
+    res.json(posts)
   } catch (error) {
     debug({ error })
     res.status(404).json({ error: error.message })
@@ -37,28 +79,30 @@ exports.getPost = async (req, res) => {
 }
 
 // get all post
-exports.getPostById = async (req, res) => {
+exports.getPost = async (req, res) => {
   try {
-    const { id } = req.params
+    const { postId } = req.params
+    const { populate } = req.query
 
-    const data = await Post.findById(id)
-      .populate({
-        path: 'user',
-        select: 'username img_thumb'
-      })
-      .populate({
-        path: 'comment',
-        select: 'sender timeSend like msg',
-        populate: {
-          path: 'sender',
-          select: 'username img_thumb'
+    const populates = []
+
+    if (populate) {
+      const populateOptions = ['user', 'comment', 'like']
+      // populate=comment,like,user
+      const opt = populate.split(',')
+
+      populateOptions.forEach((val) => {
+        if (opt.includes(val)) {
+          populates.push(val)
         }
       })
-      .populate({
-        path: 'like',
-        select: 'username img_thumb'
-      })
-    res.status(200).json(data)
+    }
+
+    const post = await Post.findById(postId).populate(populates)
+    if (!post) {
+      return res.status(404).json({ error: 'posts no found' })
+    }
+    res.status(200).json(post)
   } catch (error) {
     debug({ error })
     res.status(404).json({ error: error.message })

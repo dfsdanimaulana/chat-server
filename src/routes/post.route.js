@@ -2,15 +2,13 @@ const router = require('express').Router()
 const { postController } = require('../controllers')
 const { authJwt } = require('../middleware')
 
-router.route('/:postId').get(postController.getPostById).delete(authJwt.verifyToken, postController.deletePost)
+router.route('/').get(postController.getPosts).post(authJwt.verifyToken, postController.createNewPost)
 
-// get all user posts by userId
-router.get('/user/:userId', postController.getUserPostById)
+router.route('/:postId').get(postController.getPost).delete(authJwt.verifyToken, postController.deletePost)
 
 router.route('/like').put(authJwt.verifyToken, postController.togglePostLike)
 
 router.route('/save').put(authJwt.verifyToken, postController.toggleUserSavedPost)
 
-router.route('/').get(postController.getPost).post(authJwt.verifyToken, postController.createNewPost)
 
 module.exports = router
