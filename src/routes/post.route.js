@@ -1,50 +1,16 @@
 const router = require('express').Router()
-
-// post controller
-const {
-  getPost,
-  createNewPost,
-  updatePostCaption,
-  deletePost,
-  getUserPostById,
-  togglePostLike,
-  toggleUserSavedPost,
-  getPostById
-} = require('../controllers/post.controller')
-
-// Middleware
+const { postController } = require('../controllers')
 const { authJwt } = require('../middleware')
-const { verifyToken } = authJwt
 
-/* ============================ GET METHODS ============================ */
-// get post by id
-router.get('/:id', getPostById)
+router.route('/').get(postController.getPost).post(authJwt.verifyToken, postController.createNewPost)
+
+router.route('/:postId').get(postController.getPostById).delete(authJwt.verifyToken, postController.deletePost)
 
 // get all user posts by userId
-router.get('/user/:userId', getUserPostById)
+router.get('/user/:userId', postController.getUserPostById)
 
-// get post
-router.get('/', getPost)
+router.route('/like').put(authJwt.verifyToken, postController.togglePostLike)
 
-/* ============================ POST METHODS ============================ */
-
-// Add post
-router.post('/', [verifyToken], createNewPost)
-
-/* ============================ PUT METHODS ============================ */
-
-// toggle like and unlike post
-router.put('/like', [verifyToken], togglePostLike)
-
-// toggle save and unsave selected post
-router.put('/save', [verifyToken], toggleUserSavedPost)
-
-// update post
-router.put('/', [verifyToken], updatePostCaption)
-
-/* ============================ DELETE METHODS ============================ */
-
-// delete post
-router.delete('/:id', [verifyToken], deletePost)
+router.route('/save').put(authJwt.verifyToken, postController.toggleUserSavedPost)
 
 module.exports = router

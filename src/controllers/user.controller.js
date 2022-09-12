@@ -1,16 +1,74 @@
-'use strict'
-
-// user models
+const debug = require('debug')('dev')
+const httpStatus = require('http-status')
+const { cloudinary } = require('../config/cloudinary')
 const db = require('../models')
 const User = db.user
-const debug = require('debug')('dev')
-const { cloudinary } = require('../config/cloudinary')
 
 // get all user in database
 exports.getUsers = async (req, res) => {
+  const filters = {}
+  const options = {}
+  const populates = []
+
+  const { sortBy, username, populate } = req.query
+
+  if (sortBy) {
+    // sortBy=createdAt:desc,username:desc
+    const opt = {}
+    sortBy
+      .split(',')
+      .map((val) => val.split(':'))
+      .map((val) => (opt[val[0]] = val[1]))
+
+    if (opt.createdAt) {
+      if (opt.createdAt === 'desc') {
+        options.createdAt = -1
+      } else {
+        options.createdAt = 1
+      }
+    }
+
+    if (opt.username) {
+      if (opt.username === 'desc') {
+        options.username = -1
+      } else {
+        options.username = 1
+      }
+    }
+  } else {
+    options.createdAt = 1
+  }
+
+  if (username) {
+    filters.username = username
+  }
+
+  if (populate) {
+    const populateOptions = ['post', 'savedPost', 'roles']
+    // populate=roles
+    const opt = populate.split(',')
+
+    populateOptions.forEach((val) => {
+      if (opt.includes(val)) {
+        populates.push(val)
+      }
+    })
+  }
+
   try {
-    const user = await User.find({}, '_id username name email gender desc followers following post img_thumb img_thumb_id')
-    res.status(200).json(user)
+    const users = await User.find(filters).populate(populates).sort(options)
+    if (!users) {
+      return res.status(httpStatus.NOT_FOUND).json({ error: 'users not found' })
+    }
+    const [...datas] = users
+    const filteredDatas = []
+
+    datas.map((data) => {
+      const { password, __v, createdAt, updatedAt, ...newData } = data._doc
+      filteredDatas.push(newData)
+    })
+
+    res.json(filteredDatas)
   } catch (err) {
     debug(err)
     res.status(404).json({
@@ -67,7 +125,7 @@ exports.updateProfilePic = async (req, res) => {
       img_thumb_id: uploadResponse.public_id
     })
 
-    res.status(200).json({
+    res.json({
       message: 'Update success',
       img_thumb: uploadResponse.secure_url
     })
@@ -89,6 +147,9 @@ exports.removeUser = async (req, res) => {
         error: 'user not found'
       })
     }
+
+    // remove user's post -> remove post image when remove post
+
     res.json({
       message: `user with id=${user._id} and username=${user.username} has been deleted`
     })
@@ -100,28 +161,31 @@ exports.removeUser = async (req, res) => {
   }
 }
 
-exports.getUserWithPost = async (req, res) => {
+exports.getUser = async (req, res) => {
   try {
-    const user = await User.find().populate('post')
-    res.json(user)
-  } catch (err) {
-    debug({ err })
-    res.status(404).json({
-      error: err.message
-    })
-  }
-}
+    const { userId } = req.params
+    const { populate } = req.query
 
-exports.getUserById = async (req, res) => {
-  try {
-    const { id } = req.params
-    const user = await User.findById(id).populate({
-      path: 'savedPost',
-      populate: 'like comment'
-    })
+    const populates = []
 
+    if (populate) {
+      const populateOptions = ['post', 'savedPost', 'roles']
+      // populate=post,savedPost,roles
+      const opt = populate.split(',')
+
+      populateOptions.forEach((val) => {
+        if (opt.includes(val)) {
+          populates.push(val)
+        }
+      })
+    }
+
+    const user = await User.findById(userId).populate(populates)
+    if (!user) {
+      return res.status(httpStatus.NOT_FOUND).json({ error: 'user not found' })
+    }
     // send except password
-    const { password, ...rest } = user._doc
+    const { password, __v, createdAt, updatedAt, ...rest } = user._doc
 
     return res.json({ ...rest })
   } catch (err) {

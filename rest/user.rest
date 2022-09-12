@@ -2,9 +2,21 @@
 GET {{base}}/user
 
 ###
+// get all user with query
+GET {{base}}/user?username=guest&sortBy=createdAt:asc
+
+###
+// get all user with query
+GET {{base}}/user?sortBy=createdAd:desc&populate=roles,posts
+
+###
 
 // get user by id
-GET {{base}}/user/63137937ba39d74d36e1cc8d
+GET {{base}}/user/631e30a632dd6b172834e83c
+###
+
+// get user by id
+GET {{base}}/user/631e30a632dd6b172834e83c?populate=post,savedPost,roles
 
 ###
 // update user data by id

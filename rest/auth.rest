@@ -19,9 +19,9 @@ POST {{base}}/auth/register
 Content-Type: application/json
 
 {
-    "username":"guest",
-    "gender": "male",
-    "email":"guest@gmail.com",
+    "username":"dewi",
+    "gender": "female",
+    "email":"dewi@gmail.com",
     "password":"test123",
     "confirm_password":"test123"
 }
