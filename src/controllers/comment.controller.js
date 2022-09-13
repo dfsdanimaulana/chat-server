@@ -1,7 +1,5 @@
-'use strict'
-
 const debug = require('debug')('dev')
-
+const httpStatus = require('http-status')
 const db = require('../models')
 const PostComment = db.comment
 const Post = db.post
@@ -9,16 +7,51 @@ const Post = db.post
 // get all comment
 exports.getComments = async (req, res) => {
   try {
-    const comments = await PostComment.find()
-      .populate({
-        path: 'sender',
-        select: 'username img_thumb'
+    const filters = {}
+    const options = {}
+    const populates = []
+
+    const { sortBy, populate, postId } = req.query
+
+    if (sortBy) {
+      // sortBy=createdAt:desc
+      const opt = {}
+      sortBy
+        .split(',')
+        .map((val) => val.split(':'))
+        .map((val) => (opt[val[0]] = val[1]))
+
+      if (opt.createdAt) {
+        if (opt.createdAt === 'desc') {
+          options.createdAt = -1
+        } else {
+          options.createdAt = 1
+        }
+      }
+    } else {
+      options.createdAt = 1
+    }
+
+    if (postId) {
+      filters.postId = postId
+    }
+
+    if (populate) {
+      const populateOptions = ['sender', 'postId', 'like']
+      // populate=user,comment:sender,like
+      const opt = populate.split(',')
+
+      populateOptions.forEach((val) => {
+        if (opt.includes(val)) {
+          populates.push(val)
+        }
       })
-      .populate({
-        path: 'like',
-        select: 'username img_thumb'
-      })
-      .sort({ createdAt: -1 })
+    }
+
+    const comments = await PostComment.find(filters).populate(populates).sort(options)
+    if (!comments) {
+      return res.status(404).json({ error: 'comments no found' })
+    }
 
     res.status(200).json(comments)
   } catch (err) {
@@ -30,7 +63,7 @@ exports.getComments = async (req, res) => {
 }
 
 // create new comment
-exports.addComment = async (req, res) => {
+exports.createComment = async (req, res) => {
   try {
     const { senderId, postId, msg } = req.body
 
@@ -64,18 +97,31 @@ exports.addComment = async (req, res) => {
 }
 
 // get comment by post id
-exports.getCommentByPostId = async (req, res) => {
+exports.getComment = async (req, res) => {
   try {
-    const postId = req.params.id
+    const { commentId } = req.params
+    const { populate } = req.query
 
-    const data = await PostComment.find({
-      postId
-    }).populate({
-      path: 'sender',
-      select: 'username img_thumb'
-    })
+    const populates = []
 
-    res.json(data)
+    if (populate) {
+      const populateOptions = ['user', 'comment', 'like']
+      // populate=comment,like,user
+      const opt = populate.split(',')
+
+      populateOptions.forEach((val) => {
+        if (opt.includes(val)) {
+          populates.push(val)
+        }
+      })
+    }
+
+    const comment = await PostComment.findById(commentId).populate(populates)
+    if (!comment) {
+      return res.status(404).json({ error: 'comment no found' })
+    }
+
+    res.json(comment)
   } catch (error) {
     debug(error)
     res.status(400).json({ error: error.message })
@@ -121,22 +167,22 @@ exports.unlikeComment = (req, res, next) => {
 }
 
 // delete comment by id
-exports.deleteCommentById = async (req, res) => {
+exports.deleteComment = async (req, res) => {
   try {
-    const { id } = req.params
+    const { commentId } = req.params
 
     // delete comment
-    const deletedComment = await PostComment.findByIdAndDelete(id)
+    const deletedComment = await PostComment.findByIdAndDelete(commentId)
 
     // await deletedComment.removeCommentToPost(deletedComment.postId)
     // delete comment in post comment array
     await Post.findByIdAndUpdate(deletedComment.postId, {
       $pull: {
-        comment: id
+        comment: commentId
       }
     })
 
-    res.status(200).json({ message: 'comment deleted' })
+    res.status(httpStatus.NO_CONTENT).json({ message: 'comment deleted' })
   } catch (err) {
     debug({ err })
     res.status(400).json({ error: err.message })

@@ -1,40 +1,16 @@
 const router = require('express').Router()
 
 // Controllers
-const {
-  addComment,
-  likeComment,
-  unlikeComment,
-  getCommentByPostId,
-  getComments,
-  deleteCommentById
-} = require('../controllers/comment.controller')
+const { commentController } = require('../controllers')
 
 // Middleware
 const { authJwt } = require('../middleware')
-const { verifyToken } = authJwt
 
-/* ============================ GET METHODS ============================ */
+router
+  .route('/:commentId')
+  .get(authJwt.verifyToken, commentController.getComment)
+  .delete(authJwt.verifyToken, commentController.deleteComment)
 
-// get comment by post id
-router.get('/:id', getCommentByPostId)
-
-// get all post comments
-router.get('/', getComments)
-
-/* ============================ POST METHODS ============================ */
-
-// add new comment
-router.post('/', [verifyToken], addComment)
-
-/* ============================ PUT METHODS ============================ */
-
-// like comment
-router.put('/like', [verifyToken], likeComment)
-// unlike comment
-router.put('/unlike', [verifyToken], unlikeComment)
-
-/* ============================ DELETE METHODS ============================ */
-router.delete('/:id', [verifyToken], deleteCommentById)
+router.route('/').get(commentController.getComments).post(authJwt.verifyToken, commentController.createComment)
 
 module.exports = router

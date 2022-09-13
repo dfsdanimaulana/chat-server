@@ -1,4 +1,5 @@
 const debug = require('debug')('dev')
+const httpStatus = require('http-status')
 const { isAlpha } = require('validator')
 const { cloudinary } = require('../config/cloudinary')
 const db = require('../models')
@@ -54,23 +55,7 @@ exports.getPosts = async (req, res) => {
     if (!posts) {
       return res.status(404).json({ error: 'posts no found' })
     }
-    // .sort({ createdAt: -1 })
-    // .populate({
-    //   path: 'user',
-    //   select: 'username img_thumb'
-    // })
-    // .populate({
-    //   path: 'comment',
-    //   select: 'sender timeSend like msg',
-    //   populate: {
-    //     path: 'sender',
-    //     select: 'username img_thumb'
-    //   }
-    // })
-    // .populate({
-    //   path: 'like',
-    //   select: 'username img_thumb'
-    // })
+
     res.json(posts)
   } catch (error) {
     debug({ error })
@@ -102,7 +87,7 @@ exports.getPost = async (req, res) => {
     if (!post) {
       return res.status(404).json({ error: 'posts no found' })
     }
-    res.status(200).json(post)
+    res.json(post)
   } catch (error) {
     debug({ error })
     res.status(404).json({ error: error.message })
@@ -110,7 +95,7 @@ exports.getPost = async (req, res) => {
 }
 
 // create new post
-exports.createNewPost = async (req, res) => {
+exports.createPost = async (req, res) => {
   const { userId, caption, hashtag, image, uniqueId } = req.body
 
   // check if image is not empty
@@ -153,23 +138,18 @@ exports.createNewPost = async (req, res) => {
       const uploadResponse = await cloudinary.uploader.upload(img, {
         upload_preset: process.env.CLOUDINARY_UPLOAD_POST
       })
-      await post.addImgPostId([uploadResponse.public_id])
-      await post.addImgPostUrl([uploadResponse.secure_url])
+      await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
     }
 
-    // add hashtag to post
-    if (arrHashtag.length) {
-      await post.addHashtag(arrHashtag)
-    }
-
-    // save post id to user post array
-    await User.findByIdAndUpdate(userId, {
-      $addToSet: {
-        post: savedPost._id
-      }
-    })
-
-    res.status(200).json({ message: 'posted!', data: savedPost })
+    await Promise.all([
+      post.addHashtag(arrHashtag),
+      User.findByIdAndUpdate(userId, {
+        $addToSet: {
+          post: savedPost._id
+        }
+      })
+    ])
+    res.status(httpStatus.NO_CONTENT).json({ message: 'posted!' })
   } catch (err) {
     res.status(400).json({ error: 'failed add post to user post', err })
   }
@@ -282,7 +262,7 @@ exports.togglePostLike = async (req, res) => {
 }
 
 // toggle save post in user saved post field
-exports.toggleUserSavedPost = async (req, res) => {
+exports.togglePostSave = async (req, res) => {
   try {
     const { userId, postId } = req.body
 
@@ -291,35 +271,55 @@ exports.toggleUserSavedPost = async (req, res) => {
     }
 
     // check if user already save the selected post or not
-    const user = await User.findById(userId, 'savedPost')
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(httpStatus.NOT_FOUND).json({ error: 'user not found' })
+    }
+    // if (user.savedPost.includes(postId)) {
+    //   await User.updateOne(
+    //     { _id: userId },
+    //     {
+    //       $pull: {
+    //         savedPost: postId
+    //       }
+    //     }
+    //   )
+    //   res.status(200).json({ message: 'post unsaved' })
+    // } else {
+    //   // save selected post
+    //   await User.updateOne(
+    //     { _id: userId },
+    //     {
+    //       $addToSet: {
+    //         savedPost: {
+    //           $each: [postId]
+    //         }
+    //       }
+    //     }
+    //   )
+
+    let action = {
+      $addToSet: {
+        savedPost: {
+          $each: [postId]
+        }
+      }
+    }
+    let message = 'post saved'
 
     if (user.savedPost.includes(postId)) {
-      // unsaved selected post
-      await User.updateOne(
-        { _id: userId },
-        {
-          $pull: {
-            savedPost: postId
-          }
+      action = {
+        $pull: {
+          savedPost: postId
         }
-      )
+      }
 
-      res.status(200).json({ message: 'post unsaved' })
-    } else {
-      // save selected post
-      await User.updateOne(
-        { _id: userId },
-        {
-          $addToSet: {
-            savedPost: {
-              $each: [postId]
-            }
-          }
-        }
-      )
-
-      res.status(200).json({ message: 'post saved' })
+      message = 'post unsaved'
     }
+
+    await User.updateOne({ _id: userId }, action)
+
+    res.status(200).json({ message })
   } catch (err) {
     debug({ err })
     res.status(400).json({ error: err.message })
