@@ -29,7 +29,7 @@ Content-Type: application/json
 
 ###
 // refresh token require refresh token from cookie
-POST {{base}}/auth/refresh
+GET {{base}}/auth/refresh
 Authorization: Bearer {{token}}
 
 

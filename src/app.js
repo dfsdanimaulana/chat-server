@@ -2,10 +2,32 @@ const express = require('express')
 const createError = require('http-errors')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const session = require('express-session')
+const passport = require('passport')
 require('dotenv').config()
 const routes = require('./routes')
+require('./config/passport')
 
 const app = express()
+
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }))
+
+app.use(cookieParser())
+
+app.use(
+  session({
+    name: 'session',
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    keys: ['danapp'],
+    maxAge: 24 * 60 * 60 * 100
+  })
+)
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 // cors security
 app.use(
@@ -15,11 +37,6 @@ app.use(
     credentials: true
   })
 )
-
-app.use(express.json({ limit: '50mb' }))
-app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }))
-
-app.use(cookieParser())
 
 // Routes
 app.use('/v1', routes)
