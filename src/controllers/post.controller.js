@@ -275,28 +275,6 @@ exports.togglePostSave = async (req, res) => {
     if (!user) {
       return res.status(httpStatus.NOT_FOUND).json({ error: 'user not found' })
     }
-    // if (user.savedPost.includes(postId)) {
-    //   await User.updateOne(
-    //     { _id: userId },
-    //     {
-    //       $pull: {
-    //         savedPost: postId
-    //       }
-    //     }
-    //   )
-    //   res.status(200).json({ message: 'post unsaved' })
-    // } else {
-    //   // save selected post
-    //   await User.updateOne(
-    //     { _id: userId },
-    //     {
-    //       $addToSet: {
-    //         savedPost: {
-    //           $each: [postId]
-    //         }
-    //       }
-    //     }
-    //   )
 
     let action = {
       $addToSet: {
@@ -319,7 +297,7 @@ exports.togglePostSave = async (req, res) => {
 
     await User.updateOne({ _id: userId }, action)
 
-    res.status(200).json({ message })
+    res.json({ message })
   } catch (err) {
     debug({ err })
     res.status(400).json({ error: err.message })
