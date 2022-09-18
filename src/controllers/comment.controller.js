@@ -128,38 +128,39 @@ exports.getComment = async (req, res) => {
   }
 }
 
-// like comment di postingan
-exports.likeComment = (req, res, next) => {
+exports.toggleLikeComment = async (req, res) => {
   try {
-    const { userId, postId } = req.body
-    const addLike = PostComment.findByIdAndUpdate(postId, {
+    const { commentId } = req.params
+    const { userId } = req.body
+    // check i user already like the comment or not
+    // liked by user -> unlike
+    // check if user already save the selected post or not
+    const comment = await PostComment.findById(commentId)
+    if (!comment) {
+      return res.status(httpStatus.NOT_FOUND).json({ error: 'comment not found' })
+    }
+
+    let action = {
       $addToSet: {
         like: {
-          _id: userId
+          $each: [userId]
         }
       }
-    })
-    debug(addLike)
-    next()
-  } catch (error) {
-    debug({ error })
-    res.status(400).json({ error: 'like gagal' })
-  }
-}
+    }
+    let message = 'comment liked'
 
-// unlike comment di postingan
-exports.unlikeComment = (req, res, next) => {
-  try {
-    const { userId, postId } = req.body
-    const minLike = PostComment.findByIdAndUpdate(postId, {
-      $pull: {
-        like: {
-          _id: userId
+    if (comment.like.includes(userId)) {
+      action = {
+        $pull: {
+          like: userId
         }
       }
-    })
-    debug(minLike)
-    next()
+
+      message = 'comment unlike'
+    }
+
+    await PostComment.updateOne({ _id: commentId }, action)
+    res.json({ message })
   } catch (err) {
     debug({ err })
     res.status(400).json({ error: err.message })
