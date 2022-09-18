@@ -2,9 +2,10 @@ const passport = require('passport')
 require('dotenv').config()
 const router = require('express').Router()
 const { authController } = require('../controllers')
-const { authJwt, verifySignUp } = require('../middleware')
+const { authValidation } = require('../validations')
+const { authJwt, verifySignUp, validate } = require('../middleware')
 
-router.route('/login').post(authController.userLogin)
+router.route('/login').post(validate(authValidation.login), authController.login)
 router
   .route('/register')
   .post(verifySignUp.checkDuplicateUsernameOrEmail, verifySignUp.validateData, authController.userRegister)

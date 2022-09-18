@@ -76,7 +76,7 @@ exports.refreshToken = (req, res) => {
 /**
  * when user login
  */
-exports.userLogin = async (req, res) => {
+exports.login = async (req, res) => {
   const { username, password: inputPassword } = req.body
   try {
     // get user password by username
