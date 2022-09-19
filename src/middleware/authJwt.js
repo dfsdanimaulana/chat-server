@@ -22,7 +22,7 @@ exports.verifyToken = (req, res, next) => {
   jwt.verify(token, process.env.JWT_TOKEN_SECRET, (err, decoded) => {
     if (err)
       return res.status(403).json({
-        error: 'Token is not valid!'
+        error: err.message
       })
     req.userId = decoded._id // payload contain id and username
     next()
