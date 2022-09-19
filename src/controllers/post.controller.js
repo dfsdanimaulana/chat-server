@@ -96,33 +96,20 @@ exports.getPost = async (req, res) => {
 
 // create new post
 exports.createPost = async (req, res) => {
-  const { userId, caption, hashtag, image, uniqueId } = req.body
-
-  // check if image is not empty
-  if (!image || image.length <= 0) {
-    return res.status(400).json({ error: 'please select an image' })
-  }
-
-  // cek caption length
-  if (caption.length > 100) {
-    return res.status(400).json({ error: 'caption must be less than 100 character' })
-  }
-
-  // uniqueId must be only alphabet
-  if (!isAlpha(uniqueId)) {
-    return res.status(400).json({ error: 'uniqueId must only contain alphabet' })
-  }
-
-  // handle hashtag
-  const arrHashtag = []
-
-  if (hashtag) {
-    // format string hashtag to array
-    const hashtags = hashtag.split(' ')
-    hashtags.filter((val) => val !== '').map((val) => arrHashtag.push(val))
-  }
-
   try {
+    const { userId, caption, hashtag, image, uniqueId, video } = req.body
+
+    // handle hashtag
+    const arrHashtag = []
+
+    if (hashtag) {
+      // format string hashtag to array
+      const hashtags = hashtag
+        .split(' ')
+        .filter((val) => val !== '')
+        .map((val) => arrHashtag.push(val))
+    }
+
     // create new post
     const post = new Post({
       user: userId,
@@ -134,11 +121,25 @@ exports.createPost = async (req, res) => {
     const savedPost = await post.save()
 
     // upload array of image one by one and save url to db
-    for (const img of image) {
-      const uploadResponse = await cloudinary.uploader.upload(img, {
-        upload_preset: process.env.CLOUDINARY_UPLOAD_POST
-      })
-      await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
+    if (image.length) {
+      for (const img of image) {
+        const uploadResponse = await cloudinary.uploader.upload(img, {
+          upload_preset: process.env.CLOUDINARY_UPLOAD_POST
+        })
+        await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
+      }
+    }
+    // if (image.length) {
+    //   image.map(async (img) => {
+    //     const uploadResponse = await cloudinary.uploader.upload(img, {
+    //       upload_preset: process.env.CLOUDINARY_UPLOAD_POST
+    //     })
+    //     await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
+    //   })
+    // }
+
+    if (video) {
+      // integrate using multer
     }
 
     await Promise.all([
@@ -149,7 +150,8 @@ exports.createPost = async (req, res) => {
         }
       })
     ])
-    res.status(httpStatus.NO_CONTENT).json({ message: 'posted!' })
+
+    res.status(httpStatus.CREATED).json(savedPost)
   } catch (err) {
     res.status(400).json({ error: 'failed add post to user post', err })
   }
