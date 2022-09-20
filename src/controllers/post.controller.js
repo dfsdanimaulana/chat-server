@@ -104,7 +104,7 @@ exports.createPost = async (req, res) => {
 
     if (hashtag) {
       // format string hashtag to array
-      const hashtags = hashtag
+      hashtag
         .split(' ')
         .filter((val) => val !== '')
         .map((val) => arrHashtag.push(val))
@@ -129,17 +129,9 @@ exports.createPost = async (req, res) => {
         await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
       }
     }
-    // if (image.length) {
-    //   image.map(async (img) => {
-    //     const uploadResponse = await cloudinary.uploader.upload(img, {
-    //       upload_preset: process.env.CLOUDINARY_UPLOAD_POST
-    //     })
-    //     await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
-    //   })
-    // }
 
     if (video) {
-      // integrate using multer
+      // handle video
     }
 
     await Promise.all([
@@ -153,7 +145,7 @@ exports.createPost = async (req, res) => {
 
     res.status(httpStatus.CREATED).json(savedPost)
   } catch (err) {
-    res.status(400).json({ error: 'failed add post to user post', err })
+    res.status(400).json({ error: err.message, err })
   }
 }
 
