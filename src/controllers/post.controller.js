@@ -1,6 +1,5 @@
 const debug = require('debug')('dev')
 const httpStatus = require('http-status')
-const { isAlpha } = require('validator')
 const { cloudinary } = require('../config/cloudinary')
 const db = require('../models')
 const Post = db.post
@@ -122,12 +121,12 @@ exports.createPost = async (req, res) => {
 
     // upload array of image one by one and save url to db
     if (image.length) {
-      for (const img of image) {
+      image.map(async (img) => {
         const uploadResponse = await cloudinary.uploader.upload(img, {
           upload_preset: process.env.CLOUDINARY_UPLOAD_POST
         })
         await Promise.all([post.addImgPostId([uploadResponse.public_id]), post.addImgPostUrl([uploadResponse.secure_url])])
-      }
+      })
     }
 
     if (video) {
@@ -183,9 +182,7 @@ exports.deletePost = async (req, res) => {
     const publicId = deletedPost.img_post_id
 
     // delete image in cloudinary
-    for (const pbId of publicId) {
-      await cloudinary.uploader.destroy(pbId)
-    }
+    await Promise.all(publicId.map((pbId) => cloudinary.uploader.destroy(pbId)))
 
     // remove post id in user post filed and user savedPost field
     const userId = deletedPost.user._id
